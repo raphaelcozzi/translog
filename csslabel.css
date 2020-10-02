@@ -1,0 +1,16 @@
+.etiqueta {
+   font-family: Futura,Trebuchet MS,Arial,sans-serif; 
+
+}
+
+
+
+@media print {  
+  @page {
+/*    sheet-size: 110mm 76mm; */
+sheet-size: 297mm 210mm; 
+    
+    margin: 1mm 1mm 1mm 1mm;
+  }
+}
+

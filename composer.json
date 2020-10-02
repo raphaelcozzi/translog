@@ -1,0 +1,22 @@
+{
+    "name": "gsu/papaya",
+    "description": "Framework Payaya",
+    "license": "GPL",
+    "authors": [
+        {
+            "name": "Raphael Cozzi",
+            "email": "raphaelcozzi@gmail.com"
+        }
+    ],
+    "require": {
+       "php": ">=5.3.3",
+        "monolog/monolog": "^1.22",
+        "wixel/gump": "^1.4",
+        "aws/aws-sdk-php": "2.*",
+        "php-http/message": "^1.7",
+        "chillerlan/php-qrcode": "^1.1"
+    },
+    "require-dev": {
+       "phpunit/phpunit": "^4.3"
+    }
+}

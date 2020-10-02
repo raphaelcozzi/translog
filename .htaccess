@@ -1,0 +1,25 @@
+RewriteEngine On
+#aqui criamos uma condicao para que os arquivos sejam ignorados nas regras abaixo
+    RewriteCond %{REQUEST_FILENAME} !-f
+  #aqui criamos uma condicao para que diretorios sejam ignorados nas regras abaixo
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+
+RewriteRule ^([a-z]+)\/([a-z]+)\/([0-9-a-z]+)\/([\w,.@:=!\?-]+)$ index.php?module=$1&method=$2&id=$3&subid=$4 [NC,L]
+RewriteRule ^([a-z]+)\/([a-z]+)\/([0-9-a-z]+)$ index.php?module=$1&method=$2&id=$3 [NC,L]
+RewriteRule ^([a-z]+)\/([a-z]+)$ index.php?module=$1&method=$2 [NC,L]
+
+
+# Quando na URL chamado so um parametro (/livros, /contato) carrega por padrao o metodo main de toda classe
+RewriteRule ^([a-z]+)\/?$ index.php?module=$1&method=main [NC,L]
+
+
+# Quando acessar diretamente sem passar par�metros, carrega a p�gina inicial
+RewriteRule ^$ index.php?module=home&method=main [QSA,L,NC]
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Defina o pacote “ea-php56” como a linguagem padrão de programação “PHP”.
+<IfModule mime_module>
+  AddType application/x-httpd-ea-php56 .php .php5 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
