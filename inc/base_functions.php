@@ -482,9 +482,11 @@ function montaForm($form)
                    if(strlen($db->f("campo_style")) > 3)
                       $form_content .= ' style="'.$db->f("campo_style").'" ';
 
-                   if(strlen($db->f("campo_value")) > 3)
+                   if(strlen($db->f("campo_value")) > 0)
                       $form_content .= ' value="'.$db->f("campo_value").'" ';
 
+                   if(strlen($db->f("campo_min")) > 0)
+                      $form_content .= ' min="'.$db->f("campo_min").'" ';
 
                   $form_content .= '>
                      <span class="help-block"></span>

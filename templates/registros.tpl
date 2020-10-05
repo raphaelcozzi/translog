@@ -10,8 +10,8 @@
       <form action="index.php?module=registros&method=insere" method="post" name="editar"  class="form-horizontal" enctype="multipart/form-data">
          <input type="hidden" name="tipo" value="{tipo}">
          <div class="form-body">
-            {veiculos}
             {entregadores}
+            {veiculos}
             {form}
          </div>
          <div class="form-actions">
