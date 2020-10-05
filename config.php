@@ -27,7 +27,7 @@ define("SENHA_EMAIL","trinityn3o@"); // Senha do email
 define("HOST_EMAIL","ssl://smtp.gmail.com"); // Servidor de autenticação
 
 define("SENDER_EMAIL","archasys@gmail.com"); // Remetente
-define("NOME_EMAIL","Global Soft Union"); // Nome do remetente
+define("NOME_EMAIL","L4 LOG"); // Nome do remetente
 define("PORT_EMAIL","465"); // Porta de autenticação
 define("AUTH_EMAIL",true); // Autenticação no envio (true ou false)
 

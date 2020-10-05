@@ -249,6 +249,7 @@ require_once("modules/home.php");
 		$GLOBALS["base"]->template = new template();       
 		$GLOBALS["base"]->template->set_var('form',$form);
       
+		$GLOBALS["base"]->template->set_var('dados_bancarios',$dados_bancarios);
 		$GLOBALS["base"]->template->set_var('veiculos',$veiculos);
 		$GLOBALS["base"]->template->set_var('estados',$estados);
 		$GLOBALS["base"]->template->set_var('cidades',$cidades);

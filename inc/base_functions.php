@@ -444,8 +444,8 @@ function montaForm($form)
    for($l = 0; $l < $db->num_rows(); $l++)
    {
       
-      // Campos do tipo text, number, file, tel, email, password e hidden
-      if($db->f("campo_type") != 3 && $db->f("campo_type") != 7 && $db->f("campo_type") != 8 && $db->f("campo_type") != 9  && $db->f("campo_type") != 12 )
+      // Campos do tipo text, number, file, tel, email, password 
+      if($db->f("campo_type") != 3 && $db->f("campo_type") != 7 && $db->f("campo_type") != 8 && $db->f("campo_type") != 9  && $db->f("campo_type") != 12 && $db->f("campo_type") != 11)
       {
       
          $sql2 = "SELECT nome AS type_nome FROM schema_types WHERE id = ".$db->f("campo_type")." ";
@@ -493,6 +493,25 @@ function montaForm($form)
                   </div>
                </div>';
       }
+      
+      // Campos do tipo text, number, file, tel, email, password 
+      if($db->f("campo_type") == 11 )
+      {
+      
+         $sql2 = "SELECT nome AS type_nome FROM schema_types WHERE id = ".$db->f("campo_type")." ";
+         $db2->query($sql2,__LINE__,__FILE__);
+         $db2->next_record();
+
+         $form_content .= '<input type="'.$db2->f("type_nome").'" class="'.$db->f("campo_class").'" name="'.$db->f("campo_name").'"  '.$db->f("campo_required").' '; 
+        
+                   if(strlen($db->f("campo_value")) > 0)
+                      $form_content .= ' value="'.$db->f("campo_value").'" ';
+                  $form_content .= '>
+                     <span class="help-block"></span>
+                  </div>
+               </div>';
+      }
+      
       
       // Campos do tipo date
       if($db->f("campo_type") == 3)

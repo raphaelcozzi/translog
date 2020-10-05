@@ -1,5 +1,63 @@
 <!-- BEGIN main_home -->
 <div class="row">
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <a class="dashboard-stat dashboard-stat-v2 green" href="index.php?module=registros&method=novo&tipo=1">
+                                <div class="visual">
+                                    <i class="fa fa-arrow-up"></i>
+                                </div>
+                                <div class="details">
+                                    <div class="number">
+                                        Registrar Saída
+                                    </div>
+                                    <div class="desc"></div>
+                                </div>
+                            </a>
+                        </div>
+
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <a class="dashboard-stat dashboard-stat-v2 red" href="index.php?module=registros&method=saidas">
+                                <div class="visual">
+                                    <i class="fa fa-arrow-down"></i>
+                                </div>
+                                <div class="details">
+                                    <div class="number">
+                                        Registrar Retorno
+                                    </div>
+                                    <div class="desc"></div>
+                                </div>
+                            </a>
+                        </div>
+   
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <a class="dashboard-stat dashboard-stat-v2 blue" href="index.php?module=registros&method=saidas">
+                                <div class="visual">
+                                    <i class="fa fa-arrow-up"></i>
+                                </div>
+                                <div class="details">
+                                    <div class="number">
+                                       Saídas
+                                    </div>
+                                    <div class="desc"></div>
+                                </div>
+                            </a>
+                        </div>
+<div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <a class="dashboard-stat dashboard-stat-v2 blue" href="index.php?module=registros&method=retornos">
+                                <div class="visual">
+                                    <i class="fa fa-arrow-down"></i>
+                                </div>
+                                <div class="details">
+                                    <div class="number">
+                                       Retornos
+                                    </div>
+                                    <div class="desc"></div>
+                                </div>
+                            </a>
+                        </div>
+   
+</div>
+
+<div class="row">
  <div class="col-md-12">
                         <div class="portlet light bordered">
                                         <div class="portlet-title">
@@ -517,7 +575,7 @@
             "title":"Saída"
         },
         {
-            "url":"index.php?module=registros&method=novo&tipo=2",
+            "url":"index.php?module=registros&method=saidas",
             "bgcolor":"red",
             "color":"white",
             "icon":"<i class='fa fa-arrow-circle-down'></i>",

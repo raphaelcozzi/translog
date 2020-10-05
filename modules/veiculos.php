@@ -268,6 +268,13 @@ require_once("modules/home.php");
 		$this->cabecalho();                                                                            
 		$GLOBALS["base"]->template = new template();       
 		$GLOBALS["base"]->template->set_var('form',$form);
+
+              $GLOBALS["base"]->template->set_var('modelo',$modelo);
+		$GLOBALS["base"]->template->set_var('placa',$placa);
+		$GLOBALS["base"]->template->set_var('ano',$ano);
+ 		$GLOBALS["base"]->template->set_var('km_inicial',$km_inicial);
+ 		$GLOBALS["base"]->template->set_var('obs',$obs);
+ 		$GLOBALS["base"]->template->set_var('numero_documento',$numero_documento);
       
 		$GLOBALS["base"]->template->set_var('tipos',$tipos);
 		$GLOBALS["base"]->template->set_var('marcas',$marcas);

@@ -24,6 +24,15 @@ require_once("modules/home.php");
                
                   $tipo = $_REQUEST['tipo'];
                   
+                  if(isset($_REQUEST['id_saida']) && $tipo == "2")
+                  {
+                     $id_saida = $_REQUEST['id_saida'];
+                  }
+                  else
+                  {
+                     $id_saida = "0";
+                  }
+                  
                   if($tipo == "1")
                   {
                      $tipo_registro = "Saída";
@@ -102,6 +111,7 @@ require_once("modules/home.php");
 		$GLOBALS["base"]->template->set_var('tipo_registro',$tipo_registro);
 		$GLOBALS["base"]->template->set_var('tipo',$tipo);
 
+		$GLOBALS["base"]->template->set_var('id_saida',$id_saida);
       
 		$GLOBALS["base"]->template->set_var('veiculos',$veiculos);
 		$GLOBALS["base"]->template->set_var('entregadores',$entregadores);
@@ -128,8 +138,11 @@ require_once("modules/home.php");
 		@session_start();
 		$db = new db();
 
-            if($_SESSION['id'] != $_SESSION['boss'])
-                   $this->valida_privilegios();
+            
+            if(isset($_REQUEST['id_saida']) && $_REQUEST['id_saida'] != "0")
+            {
+               $id_saida = $_REQUEST['id_saida'];
+            }
                 
 		$db = new db();
 		$db2 = new db();
@@ -162,6 +175,13 @@ require_once("modules/home.php");
 
             $id_registro = $db->get_last_insert_id("registros","id");
             
+            // Se for um retorno
+            if($tipo == "2")
+            {
+               $sql = "INSERT INTO registros_retornos (id_saida, id_retorno, dataCadastro) VALUES (".$id_saida.", ".$id_registro.", NOW())";
+               $db->query($sql,__LINE__,__FILE__);
+               $db->next_record();
+            }
             
             
             $this->notificacao("Registro efetuado com sucesso!", "green");
