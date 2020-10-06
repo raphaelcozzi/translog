@@ -93,3 +93,68 @@
 
 
 <!-- END financeiro -->
+
+
+<!-- BEGIN saidas -->
+<script>
+   function ordena()
+   {
+      return 0;
+   }
+</script>
+
+<h2>Para registrar um retorno, escolha a saída referente a ele.</h2>
+<div class="row">
+   <div class="col-md-12">
+      <!-- BEGIN EXAMPLE TABLE PORTLET-->
+      <br>
+      <div class="portlet light bordered">
+         <div class="portlet-title">
+            <div class="caption font-dark">
+               <i class="icon-list font-dark"></i>
+               <span class="caption-subject bold uppercase">Registros de Saídas</span>
+            </div>
+            <div class="tools"> </div>
+         </div>
+         <div class="portlet-body">
+            {grid}
+         </div>
+      </div>
+      <!-- END EXAMPLE TABLE PORTLET-->
+   </div>
+</div>
+
+
+<!-- END saidas -->
+
+
+<!-- BEGIN retornos -->
+<script>
+   function ordena()
+   {
+      return 0;
+   }
+</script>
+
+<div class="row">
+   <div class="col-md-12">
+      <!-- BEGIN EXAMPLE TABLE PORTLET-->
+      <br>
+      <div class="portlet light bordered">
+         <div class="portlet-title">
+            <div class="caption font-dark">
+               <i class="icon-list font-dark"></i>
+               <span class="caption-subject bold uppercase">Registros de Retornos</span>
+            </div>
+            <div class="tools"> </div>
+         </div>
+         <div class="portlet-body">
+            {grid}
+         </div>
+      </div>
+      <!-- END EXAMPLE TABLE PORTLET-->
+   </div>
+</div>
+
+
+<!-- END retornos -->

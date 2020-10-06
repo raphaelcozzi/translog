@@ -21,12 +21,25 @@ require_once("modules/home.php");
          
                $_SESSION['page_title'] = "Novo Registro";
 
+                     $id_entregador = 0;
+                     $id_veiculo = 0;
                
                   $tipo = $_REQUEST['tipo'];
                   
                   if(isset($_REQUEST['id_saida']) && $tipo == "2")
                   {
                      $id_saida = $_REQUEST['id_saida'];
+                     
+                     
+                     $sql = "SELECT id_entregador, id_veiculo FROM registros WHERE id = ".$id_saida." ";
+                     $db->query($sql,__LINE__,__FILE__);
+                     $db->next_record();
+                     if($db->num_rows() > 0)
+                     {
+                        $id_entregador = $db->f("id_entregador");
+                        $id_veiculo = $db->f("id_veiculo");
+                     }
+                     
                   }
                   else
                   {
@@ -43,7 +56,6 @@ require_once("modules/home.php");
                      $tipo_registro = "Retorno";
                   }
 
-                     $id_entregador = 0;
                   
                      $sql = "SELECT
                      veiculos.id AS id
@@ -68,7 +80,7 @@ require_once("modules/home.php");
                               $db2->query($sql2,__LINE__,__FILE__);
                               $db2->next_record();
 				
-				if($db2->num_rows() > 0)
+				if($db2->num_rows() > 0 || $id_veiculo == $db2->f("id_veiculo"))
 					$listagem_veiculos .= "selected='selected'";
 				
 				$listagem_veiculos .=  ">".$db->f("marca")." ".$db->f("modelo")." ".$db->f("placa")."</option>";			
@@ -87,7 +99,7 @@ require_once("modules/home.php");
 			{
 				$listagem_entregadores .= "<option value='".$db->f("id")."' ";
 				
-				if($db->f("id") == $entregador)
+				if($db->f("id") == $id_entregador)
 					$listagem_entregadores .= "selected='selected'";
 				
 				$listagem_entregadores .= ">".$db->f("nome")."</option>";			
@@ -184,8 +196,17 @@ require_once("modules/home.php");
             }
             
             
-            $this->notificacao("Registro efetuado com sucesso!", "green");
-            header("Location: " . ABS_LINK . "/home");
+            if($tipo == "1")
+            {
+               $this->notificacao("Registro efetuado com sucesso!", "green");
+               header("Location: " . ABS_LINK . "registros/saidas");
+            }
+            
+            if($tipo == "2")
+            {
+               $this->notificacao("Registro efetuado com sucesso!", "green");
+               header("Location: " . ABS_LINK . "registros/retornos");
+            }
             
 	   }
       
@@ -247,6 +268,7 @@ require_once("modules/home.php");
 			$sql = "SELECT
                               registros.id AS id_registro
                             , registros.volumes AS volumes
+                            , registros.obs AS obs
                            , entregadores.nome AS entregador
                            , veiculos.photo AS photo
                            , veiculos.placa AS placa
@@ -276,16 +298,44 @@ require_once("modules/home.php");
 				$data_registro = $db->f("data_registro");			
 				$hora_registro = $db->f("hora_registro");			
 				$volumes = $db->f("volumes");			
+				$obs = $db->f("obs");			
+           
+                     
+                           $entregue = $volumes;
+                           $concluido = "Sim";
+                           $cor = "000000";
 
-				$listagem .= '<tr> 
+            
+                        $sql2 = "SELECT id_retorno FROM registros_retornos WHERE id_saida = ".$id_registro." ";
+                        $db2->query($sql2,__LINE__,__FILE__);
+                        $db2->next_record();
+                        if($db2->num_rows() > 0)
+                        {
+                           $sql2 = "SELECT volumes FROM registros WHERE id = ".$db2->f("id_retorno")." ";
+                           $db2->query($sql2,__LINE__,__FILE__);
+                           $db2->next_record();
+                           
+                           $entregue = $volumes-$db2->f("volumes");
+                        }   
+                        
+                        if($entregue < $volumes)
+                        {
+                           $concluido = "Não";
+                           $cor = "ff0000";
+                        }
+                           
+                           
+            
+
+				$listagem .= '<tr style="color:#'.$cor.';"> 
 										<td>'.$entregador.'</td>
 										<td>'.$placa.'/'.$marca.'/'.$modelo.'</td>
 										<td>'.$volumes.'</td> 
 										<td>'.$data_registro.'</td> 
 										<td>'.$hora_registro.'</td> 
 										<td>'.$concluido.'</td> 
-										<td>'.$volumes.'</td> 
-										<td><img src="'.ABS_LINK.''.$photo.'" width="150"></td> 
+										<td>'.$entregue.'</td> 
+										<td>'.nl2br($obs).'</td> 
 									</tr>';
 				
 				
@@ -320,6 +370,10 @@ require_once("modules/home.php");
 			
 			$db = new db();
 			$db2 = new db();
+         
+                  
+                     $valor_diaria = 150.00;
+         
 
 			$sql = "SELECT
                               registros.id AS id_registro
@@ -338,12 +392,14 @@ require_once("modules/home.php");
                            INNER JOIN veiculos 
                                ON (registros.id_veiculo = veiculos.id)
                            INNER JOIN veiculos_marcas 
-                               ON (veiculos.id_marca = veiculos_marcas.id)";
+                               ON (veiculos.id_marca = veiculos_marcas.id) GROUP BY registros.data_registro";
 			$db->query($sql,__LINE__,__FILE__);
 			$db->next_record();
 			
 			for($i = 0; $i < $db->num_rows(); $i++)
 			{
+                           $retornados = 0;
+            
 				$id_registro = $db->f("id_registro");			
 				$entregador = $db->f("entregador");			
 				$marca = $db->f("marca");			
@@ -353,13 +409,27 @@ require_once("modules/home.php");
 				$data_registro = $db->f("data_registro");			
 				$hora_registro = $db->f("hora_registro");			
 				$volumes = $db->f("volumes");			
+            
+            
+                        $sql2 = "SELECT id_retorno FROM registros_retornos WHERE id_saida = ".$id_registro." ";
+                        $db2->query($sql2,__LINE__,__FILE__);
+                        $db2->next_record();
+                        if($db2->num_rows() > 0)
+                        {
+                           $sql2 = "SELECT volumes FROM registros WHERE id = ".$db2->f("id_retorno")." ";
+                           $db2->query($sql2,__LINE__,__FILE__);
+                           $db2->next_record();
+                           
+                           $retornados = $db2->f("volumes");
+                        }   
+            
 
 				$listagem .= '<tr> 
 										<td>'.$entregador.'</td>
 										<td>'.$data_registro.' </td> 
 										<td>'.$volumes.'</td> 
 										<td>'.$retornados.'</td> 
-										<td>'.$apagar.'</td> 
+										<td>R$ '.  $this->decimal_to_brasil_real($apagar).'</td> 
 									</tr>';
 				
 				
@@ -383,6 +453,200 @@ require_once("modules/home.php");
       
       
    }
+   
+   function  saidas()
+   {
+			@session_start();
+                        
+   			if($_SESSION['id'] != $_SESSION['boss'])
+            			$this->valida_privilegios();
+         
+                     $_SESSION['page_title'] = "Registros de Saídas";
+			
+			$db = new db();
+			$db2 = new db();
+
+			$sql = "SELECT
+                              registros.id AS id_registro
+                            , registros.volumes AS volumes
+                           , entregadores.nome AS entregador
+                           , veiculos.photo AS photo
+                           , veiculos.placa AS placa
+                           , veiculos.modelo AS modelo
+                           , veiculos_marcas.nome AS marca
+                           , DATE_FORMAT(registros.data_registro,'%d/%m/%Y') AS data_registro
+                           , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro
+                           FROM
+                           registros
+                           INNER JOIN entregadores 
+                               ON (registros.id_entregador = entregadores.id)
+                           INNER JOIN veiculos 
+                               ON (registros.id_veiculo = veiculos.id)
+                           INNER JOIN veiculos_marcas 
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 1";
+			$db->query($sql,__LINE__,__FILE__);
+			$db->next_record();
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$id_registro = $db->f("id_registro");			
+				$entregador = $db->f("entregador");			
+				$marca = $db->f("marca");			
+				$placa = $db->f("placa");			
+				$modelo = $db->f("modelo");			
+				$photo = $db->f("photo");			
+				$data_registro = $db->f("data_registro");			
+				$hora_registro = $db->f("hora_registro");			
+				$volumes = $db->f("volumes");			
+
+				$listagem .= '<tr> 
+										<td>'.$entregador.'</td>
+										<td>'.$placa.'/'.$marca.'/'.$modelo.'</td>
+										<td>'.$volumes.'</td> 
+										<td>'.$data_registro.'</td> 
+										<td>'.$hora_registro.'</td> 
+                                                                  <td align="center"><a href="index.php?module=registros&method=novo&id_saida='.$id_registro.'&tipo=2" ><button class="btn blue" >Registrar Retorno</button></a></td>
+                                                                  <td align="center"><a href="index.php?module=registros&method=exclui&id='.$id_registro.'" onclick="return(confirm(\'Confirma excluir o registro?\'))"><i class="fa fa-trash"></i></a></td>
+									</tr>';
+				
+				
+				
+				
+				$db->next_record();
+			}
+
+      
+      
+             $grid = montaGrid("sample_1",$listagem,"saidas");
+
+		$this->cabecalho();                                                                            
+		$GLOBALS["base"]->template = new template();       
+		
+		$GLOBALS["base"]->template->set_var("grid",$grid);
+													
+		$GLOBALS["base"]->write_design_specific('registros.tpl' , 'saidas');                       
+		$GLOBALS["base"]->template = new template();                                                  
+		$this->footer();                                                                           
+      
+   }
+   
+   function  retornos()
+   {
+			@session_start();
+                        
+   			if($_SESSION['id'] != $_SESSION['boss'])
+            			$this->valida_privilegios();
+         
+                     $_SESSION['page_title'] = "Registros de Retornos";
+			
+			$db = new db();
+			$db2 = new db();
+
+			$sql = "SELECT
+                              registros.id AS id_registro
+                            , registros.volumes AS volumes
+                            , registros.obs AS obs
+                           , entregadores.nome AS entregador
+                           , veiculos.photo AS photo
+                           , veiculos.placa AS placa
+                           , veiculos.modelo AS modelo
+                           , veiculos_marcas.nome AS marca
+                           , DATE_FORMAT(registros.data_registro,'%d/%m/%Y') AS data_registro
+                           , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro
+                           FROM
+                           registros
+                           INNER JOIN entregadores 
+                               ON (registros.id_entregador = entregadores.id)
+                           INNER JOIN veiculos 
+                               ON (registros.id_veiculo = veiculos.id)
+                           INNER JOIN veiculos_marcas 
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 2";
+			$db->query($sql,__LINE__,__FILE__);
+			$db->next_record();
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$id_registro = $db->f("id_registro");			
+				$entregador = $db->f("entregador");			
+				$marca = $db->f("marca");			
+				$placa = $db->f("placa");			
+				$modelo = $db->f("modelo");			
+				$photo = $db->f("photo");			
+				$data_registro = $db->f("data_registro");			
+				$hora_registro = $db->f("hora_registro");			
+				$volumes = $db->f("volumes");			
+				$obs = $db->f("obs");			
+
+				$listagem .= '<tr> 
+										<td>'.$entregador.'</td>
+										<td>'.$placa.'/'.$marca.'/'.$modelo.'</td>
+										<td>'.$volumes.'</td> 
+										<td>'.$data_registro.'</td> 
+										<td>'.$hora_registro.'</td> 
+										<td>'.nl2br($obs).'</td> 
+                                                                  <td align="center"><a href="" ><button class="btn blue" >Ver Saída</button></a></td>
+                                                                  <td align="center"><a href="index.php?module=registros&method=exclui&id='.$id_registro.'" onclick="return(confirm(\'Confirma excluir o registro?\'))"><i class="fa fa-trash"></i></a></td>
+									</tr>';
+				
+				
+				
+				
+				$db->next_record();
+			}
+
+      
+      
+             $grid = montaGrid("sample_1",$listagem,"retornos");
+
+		$this->cabecalho();                                                                            
+		$GLOBALS["base"]->template = new template();       
+		
+		$GLOBALS["base"]->template->set_var("grid",$grid);
+													
+		$GLOBALS["base"]->write_design_specific('registros.tpl' , 'retornos');                       
+		$GLOBALS["base"]->template = new template();                                                  
+		$this->footer();                                                                           
+      
+   }
+   
+   function exclui()
+   {
+      
+		@session_start();
+		$db = new db();
+
+
+            $id_registro = blockrequest($_REQUEST['id']);
+            
+            
+            $sql = "SELECT tipo FROM registros WHERE id = ".$id." ";
+            $db->query($sql,__LINE__,__FILE__);
+            $db->next_record();
+            $tipo = $db->f("tipo");
+            
+            $sql = "DELETE FROM registros WHERE id = ".$id." LIMIT 1 ";
+            $db->query($sql,__LINE__,__FILE__);
+            $db->next_record();
+
+            $sql = "DELETE FROM registros_retornos WHERE id_saida = ".$id." OR id_retorno = ".$id." ";
+            $db->query($sql,__LINE__,__FILE__);
+            $db->next_record();
+      
+      
+            if($tipo == "1")
+            {
+               $this->notificacao("Registro excluído com sucesso!", "green");
+               header("Location: " . ABS_LINK . "registros/saidas");
+            }
+            
+            if($tipo == "2")
+            {
+               $this->notificacao("Registro excluído com sucesso!", "green");
+               header("Location: " . ABS_LINK . "registros/retornos");
+            }
+   }
+   
+   
 }                                                                                                     
 
 

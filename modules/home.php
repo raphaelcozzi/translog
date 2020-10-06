@@ -37,12 +37,203 @@ class home
 		$db3 = new db();
 
 		$_SESSION['page_title'] = "Painel Principal";
+      
+      
+			$sql = "SELECT
+                              registros.id AS id_registro
+                            , registros.volumes AS volumes
+                           , entregadores.nome AS entregador
+                           , veiculos.photo AS photo
+                           , veiculos.placa AS placa
+                           , veiculos.modelo AS modelo
+                           , veiculos_marcas.nome AS marca
+                           , DATE_FORMAT(registros.data_registro,'%d/%m/%Y') AS data_registro
+                           , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro
+                           FROM
+                           registros
+                           INNER JOIN entregadores 
+                               ON (registros.id_entregador = entregadores.id)
+                           INNER JOIN veiculos 
+                               ON (registros.id_veiculo = veiculos.id)
+                           INNER JOIN veiculos_marcas 
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 1 AND TO_DAYS(registros.data_registro) = TO_DAYS(NOW()) ";
+			$db->query($sql,__LINE__,__FILE__);
+			$db->next_record();
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$id_registro = $db->f("id_registro");			
+				$entregador = $db->f("entregador");			
+				$marca = $db->f("marca");			
+				$placa = $db->f("placa");			
+				$modelo = $db->f("modelo");			
+				$photo = $db->f("photo");			
+				$data_registro = $db->f("data_registro");			
+				$hora_registro = $db->f("hora_registro");			
+				$volumes = $db->f("volumes");			
+
+				$listagem_saidas .= '<tr> 
+										<td>'.$entregador.'</td>
+										<td>'.$placa.'/'.$marca.'/'.$modelo.'</td>
+										<td>'.$volumes.'</td> 
+										<td>'.$data_registro.'</td> 
+										<td>'.$hora_registro.'</td> 
+                                                                  <td align="center"><a href="index.php?module=registros&method=novo&id_saida='.$id_registro.'&tipo=2" ><button class="btn blue" >Registrar Retorno</button></a></td>
+                                                                  <td align="center"><a href="index.php?module=registros&method=exclui&id='.$id_registro.'" onclick="return(confirm(\'Confirma excluir o registro?\'))"><i class="fa fa-trash"></i></a></td>
+									</tr>';
+				
+				
+				
+				
+				$db->next_record();
+			}
+      
+         
+			$sql = "SELECT
+                              registros.id AS id_registro
+                            , registros.volumes AS volumes
+                            , registros.obs AS obs
+                           , entregadores.nome AS entregador
+                           , veiculos.photo AS photo
+                           , veiculos.placa AS placa
+                           , veiculos.modelo AS modelo
+                           , veiculos_marcas.nome AS marca
+                           , DATE_FORMAT(registros.data_registro,'%d/%m/%Y') AS data_registro
+                           , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro
+                           FROM
+                           registros
+                           INNER JOIN entregadores 
+                               ON (registros.id_entregador = entregadores.id)
+                           INNER JOIN veiculos 
+                               ON (registros.id_veiculo = veiculos.id)
+                           INNER JOIN veiculos_marcas 
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 2 AND TO_DAYS(registros.data_registro) = TO_DAYS(NOW()) ";
+			$db->query($sql,__LINE__,__FILE__);
+			$db->next_record();
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$id_registro = $db->f("id_registro");			
+				$entregador = $db->f("entregador");			
+				$marca = $db->f("marca");			
+				$placa = $db->f("placa");			
+				$modelo = $db->f("modelo");			
+				$photo = $db->f("photo");			
+				$data_registro = $db->f("data_registro");			
+				$hora_registro = $db->f("hora_registro");			
+				$volumes = $db->f("volumes");			
+				$obs = $db->f("obs");			
+
+				$listagem_retornos .= '<tr> 
+										<td>'.$entregador.'</td>
+										<td>'.$placa.'/'.$marca.'/'.$modelo.'</td>
+										<td>'.$volumes.'</td> 
+										<td>'.$data_registro.'</td> 
+										<td>'.$hora_registro.'</td> 
+										<td>'.nl2br($obs).'</td> 
+                                                                  <td align="center"><a href="" ><button class="btn blue" >Ver Saída</button></a></td>
+                                                                  <td align="center"><a href="index.php?module=registros&method=exclui&id='.$id_registro.'" onclick="return(confirm(\'Confirma excluir o registro?\'))"><i class="fa fa-trash"></i></a></td>
+									</tr>';
+				
+				
+				
+				
+				$db->next_record();
+			}
+         
+         
+			$sql = "SELECT
+                              registros.id AS id_registro
+                            , registros.volumes AS volumes
+                            , registros.obs AS obs
+                           , entregadores.nome AS entregador
+                           , veiculos.photo AS photo
+                           , veiculos.placa AS placa
+                           , veiculos.modelo AS modelo
+                           , veiculos_marcas.nome AS marca
+                           , DATE_FORMAT(registros.data_registro,'%d/%m/%Y') AS data_registro
+                           , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro
+                           FROM
+                           registros
+                           INNER JOIN entregadores 
+                               ON (registros.id_entregador = entregadores.id)
+                           INNER JOIN veiculos 
+                               ON (registros.id_veiculo = veiculos.id)
+                           INNER JOIN veiculos_marcas 
+                               ON (veiculos.id_marca = veiculos_marcas.id)  AND TO_DAYS(registros.data_registro) = TO_DAYS(NOW())";
+			$db->query($sql,__LINE__,__FILE__);
+			$db->next_record();
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$id_registro = $db->f("id_registro");			
+				$entregador = $db->f("entregador");			
+				$marca = $db->f("marca");			
+				$placa = $db->f("placa");			
+				$modelo = $db->f("modelo");			
+				$photo = $db->f("photo");			
+				$data_registro = $db->f("data_registro");			
+				$hora_registro = $db->f("hora_registro");			
+				$volumes = $db->f("volumes");			
+				$obs = $db->f("obs");			
+           
+                     
+                           $entregue = $volumes;
+                           $concluido = "Sim";
+                           $cor = "000000";
+
+            
+                        $sql2 = "SELECT id_retorno FROM registros_retornos WHERE id_saida = ".$id_registro." ";
+                        $db2->query($sql2,__LINE__,__FILE__);
+                        $db2->next_record();
+                        if($db2->num_rows() > 0)
+                        {
+                           $sql2 = "SELECT volumes FROM registros WHERE id = ".$db2->f("id_retorno")." ";
+                           $db2->query($sql2,__LINE__,__FILE__);
+                           $db2->next_record();
+                           
+                           $entregue = $volumes-$db2->f("volumes");
+                        }   
+                        
+                        if($entregue < $volumes)
+                        {
+                           $concluido = "Não";
+                           $cor = "ff0000";
+                        }
+                           
+                           
+            
+
+				$listagem_resumo_dia .= '<tr style="color:#'.$cor.';"> 
+										<td>'.$entregador.'</td>
+										<td>'.$placa.'/'.$marca.'/'.$modelo.'</td>
+										<td>'.$volumes.'</td> 
+										<td>'.$data_registro.'</td> 
+										<td>'.$hora_registro.'</td> 
+										<td>'.$concluido.'</td> 
+										<td>'.$entregue.'</td> 
+										<td>'.nl2br($obs).'</td> 
+									</tr>';
+				
+				
+				
+				
+				$db->next_record();
+			}
+
+         
+         
+               $grid_resumo_dia = montaGrid("sample_1",$listagem_resumo_dia,"entrega");
+               $grid_saidas = montaGrid("sample_2",$listagem_saidas,"saidas");
+               $grid_retornos = montaGrid("sample_3",$listagem_retornos,"retornos");
+
 
 		$this->cabecalho();
 		$GLOBALS["base"]->template = new template();
 
-		$GLOBALS["base"]->template->set_var('listagem_resumo_financeiro_dia', $listagem_resumo_financeiro_dia);
-		$GLOBALS["base"]->template->set_var('listagem_resumo_dia', $listagem_resumo_dia);
+		$GLOBALS["base"]->template->set_var('grid_saidas', $grid_saidas);
+		$GLOBALS["base"]->template->set_var('grid_retornos', $grid_retornos);
+		$GLOBALS["base"]->template->set_var('grid_resumo_dia', $grid_resumo_dia);
 		$GLOBALS["base"]->write_design_specific('home.tpl', 'main_home');
 		$this->footer();
 	}

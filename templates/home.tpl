@@ -58,64 +58,64 @@
 </div>
 
 <div class="row">
- <div class="col-md-12">
-                        <div class="portlet light bordered">
-                                        <div class="portlet-title">
-                                            <div class="caption">
-                                                <i class="icon-list font-green-haze"></i>
-                                                <span class="caption-subject bold uppercase font-green-haze"> Resumo do dia</span>
-                                            </div>
-                                        </div>
-                                        <div class="portlet-body">
-                                           <table class="table table-striped table-bordered table-hover nowrap" id="sample_1">
-                                        <thead>
-                                            <tr>
-                                                <th>Entregador</th> 
-                                                <th>Veículo</th> 
-                                                <th>Volumes</th> 
-                                                <th>Data</th> 
-                                                <th>Hora</th> 
-                                                <th>Concluído</th> 
-                                                <th>Entregue</th> 
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                           {listagem_resumo_dia}
-                                        </tbody>
-                                           </table>
-                                        </div>
-                  </div>
-                  </div>
-                  </div>
+   <div class="col-md-12">
+      <!-- BEGIN EXAMPLE TABLE PORTLET-->
+      <br>
+      <div class="portlet light bordered">
+         <div class="portlet-title">
+            <div class="caption font-dark">
+               <i class="icon-list font-dark"></i>
+               <span class="caption-subject bold uppercase">Resumo do dia</span>
+            </div>
+            <div class="tools"> </div>
+         </div>
+         <div class="portlet-body">
+            {grid_resumo_dia}
+         </div>
+      </div>
+      <!-- END EXAMPLE TABLE PORTLET-->
+   </div>
+</div>
 <div class="row">
- <div class="col-md-12">
-                        <div class="portlet light bordered">
-                                        <div class="portlet-title">
-                                            <div class="caption">
-                                                <i class="icon-list font-green-haze"></i>
-                                                <span class="caption-subject bold uppercase font-green-haze"> Resumo Financeiro do Dia</span>
-                                            </div>
-                                        </div>
-                                        <div class="portlet-body">
-                                           <table class="table table-striped table-bordered table-hover nowrap" id="sample_2">
-                                        <thead>
-                                            <tr>
-                                                <th>Entregador</th> 
-                                                <th>Data</th> 
-                                                <th>Volumes Entregues</th> 
-                                                <th>Volumes Retornados</th> 
-                                                <th>A Pagar</th> 
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                           {listagem_resumo_financeiro_dia}
-                                        </tbody>
-                                           </table>
-                                        </div>
-                  </div>
-                  </div>
-                  </div>
+   <div class="col-md-12">
+      <!-- BEGIN EXAMPLE TABLE PORTLET-->
+      <br>
+      <div class="portlet light bordered">
+         <div class="portlet-title">
+            <div class="caption font-dark">
+               <i class="icon-list font-dark"></i>
+               <span class="caption-subject bold uppercase">Registros de Saídas do dia</span>
+            </div>
+            <div class="tools"> </div>
+         </div>
+         <div class="portlet-body">
+            {grid_saidas}
+         </div>
+      </div>
+      <!-- END EXAMPLE TABLE PORTLET-->
+   </div>
+</div>
+<div class="row">
+   <div class="col-md-12">
+      <!-- BEGIN EXAMPLE TABLE PORTLET-->
+      <br>
+      <div class="portlet light bordered">
+         <div class="portlet-title">
+            <div class="caption font-dark">
+               <i class="icon-list font-dark"></i>
+               <span class="caption-subject bold uppercase">Registros de Retornos do dia</span>
+            </div>
+            <div class="tools"> </div>
+         </div>
+         <div class="portlet-body">
+            {grid_retornos}
+         </div>
+      </div>
+      <!-- END EXAMPLE TABLE PORTLET-->
+   </div>
+</div>
 
+         
 <script>
    function ordena()
    {
