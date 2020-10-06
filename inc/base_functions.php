@@ -727,6 +727,10 @@ function montaSelect($form, $options, $id_campo)
                   <div class="input-group">
                      <select name="'.$db->f("campo_name").'" id="'.$db->f("campo_id").'"  class="'.$db->f("campo_class").'" ';
          
+         
+                      $form_content .= ' style="width:420px !important;" ';
+         
+         
                    if(strlen($db->f("campo_onclick")) > 3)
                       $form_content .= ' onClick="'.$db->f("campo_onclick").'" ';
 
@@ -745,9 +749,6 @@ function montaSelect($form, $options, $id_campo)
                    if(strlen($db->f("campo_onblur")) > 3)
                       $form_content .= ' onBlur="'.$db->f("campo_onblur").'" ';
 
-                   if(strlen($db->f("campo_style")) > 3)
-                      $form_content .= ' style="'.$db->f("campo_style").'" ';
-         
          
          $form_content .= '>
                         '.$options.'

@@ -41,6 +41,53 @@
       return 0;
    }
 </script>
+
+<div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                            
+                              <!--  <div class="portlet-title">
+                                    <div class="caption font-dark">
+                                        <span class="caption-subject bold uppercase"></span>
+                                    </div>
+                                </div> -->
+                                <div class="portlet-body">
+                                   <form action="index.php?module=registros&method=entrega" method="post" name="forms" class="form-horizontal" enctype="multipart/form-data">
+                                      <input type="hidden" name="q" value="1">
+                                                 <div class="row">
+                                                    
+                                                    
+                                                 <div class="col-md-2">
+                                                   Data Inicial: <input type="date" placeholder="DD/MM/YYYY" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" name="data_de" maxlength="10" class="form-control form-control-inline" id="data_de" value="{data_de}">
+                                                 </div>                                      
+                                                <div class="col-md-2">
+                                                   Data Final:<input type="date" placeholder="DD/MM/YYYY" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" name="data_ate" maxlength="10" class="form-control form-control-inline" id="data_ate" value="{data_ate}">
+                                                 </div>
+                                                    
+
+                                                <div class="col-md-2">
+                                                   Entregador: <br><select name="id_entregador" class="form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+                                                      {listagem_entregadores}
+                                                   </select>
+                                                 </div>
+                                                 
+                                                 <div class="col-md-2"><br>
+                                                   <button type="submit" class="btn green">Filtrar Resultados</button>
+                                                     </div>       
+                                                 
+                                                 
+                                                 </div>
+
+                                                   
+                                   </form>
+                                   
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+
 <div class="row">
    <div class="col-md-12">
       <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -49,7 +96,7 @@
          <div class="portlet-title">
             <div class="caption font-dark">
                <i class="icon-list font-dark"></i>
-               <span class="caption-subject bold uppercase">Relatório de Entrega</span>
+               <span class="caption-subject bold uppercase">Relatório de Entrega - Período: {data_de_format} - {data_ate_format}</span>
             </div>
             <div class="tools"> </div>
          </div>
@@ -71,6 +118,53 @@
       return 0;
    }
 </script>
+
+
+<div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                            
+                              <!--  <div class="portlet-title">
+                                    <div class="caption font-dark">
+                                        <span class="caption-subject bold uppercase"></span>
+                                    </div>
+                                </div> -->
+                                <div class="portlet-body">
+                                   <form action="index.php?module=registros&method=financeiro" method="post" name="forms" class="form-horizontal" enctype="multipart/form-data">
+                                      <input type="hidden" name="q" value="1">
+                                                 <div class="row">
+                                                    
+                                                    
+                                                 <div class="col-md-2">
+                                                   Data Inicial: <input type="date" placeholder="DD/MM/YYYY" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" name="data_de" maxlength="10" class="form-control form-control-inline" id="data_de" value="{data_de}">
+                                                 </div>                                      
+                                                <div class="col-md-2">
+                                                   Data Final:<input type="date" placeholder="DD/MM/YYYY" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" name="data_ate" maxlength="10" class="form-control form-control-inline" id="data_ate" value="{data_ate}">
+                                                 </div>
+                                                    
+
+                                                <div class="col-md-2">
+                                                   Entregador: <br><select name="id_entregador" class="form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+                                                      {listagem_entregadores}
+                                                   </select>
+                                                 </div>
+                                                 
+                                                 <div class="col-md-2"><br>
+                                                   <button type="submit" class="btn green">Filtrar Resultados</button>
+                                                     </div>       
+                                                 
+                                                 
+                                                 </div>
+
+                                                   
+                                   </form>
+                                   
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
 <div class="row">
    <div class="col-md-12">
       <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -79,7 +173,7 @@
          <div class="portlet-title">
             <div class="caption font-dark">
                <i class="icon-list font-dark"></i>
-               <span class="caption-subject bold uppercase">Relatório Financeiro</span>
+               <span class="caption-subject bold uppercase">Relatório Financeiro - Período: {data_de_format} - {data_ate_format}</span>
             </div>
             <div class="tools"> </div>
          </div>
@@ -104,6 +198,53 @@
 </script>
 
 <h2>Para registrar um retorno, escolha a saída referente a ele.</h2>
+<div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                            
+                              <!--  <div class="portlet-title">
+                                    <div class="caption font-dark">
+                                        <span class="caption-subject bold uppercase"></span>
+                                    </div>
+                                </div> -->
+                                <div class="portlet-body">
+                                   <form action="index.php?module=registros&method=saidas" method="post" name="forms" class="form-horizontal" enctype="multipart/form-data">
+                                      <input type="hidden" name="q" value="1">
+                                                 <div class="row">
+                                                    
+                                                    
+                                                 <div class="col-md-2">
+                                                   Data Inicial: <input type="date" placeholder="DD/MM/YYYY" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" name="data_de" maxlength="10" class="form-control form-control-inline" id="data_de" value="{data_de}">
+                                                 </div>                                      
+                                                <div class="col-md-2">
+                                                   Data Final:<input type="date" placeholder="DD/MM/YYYY" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" name="data_ate" maxlength="10" class="form-control form-control-inline" id="data_ate" value="{data_ate}">
+                                                 </div>
+                                                    
+
+                                                <div class="col-md-2">
+                                                   Entregador: <br><select name="id_entregador" class="form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+                                                      {listagem_entregadores}
+                                                   </select>
+                                                 </div>
+                                                 
+                                                 <div class="col-md-2"><br>
+                                                   <button type="submit" class="btn green">Filtrar Resultados</button>
+                                                     </div>       
+                                                 
+                                                 
+                                                 </div>
+
+                                                   
+                                   </form>
+                                   
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+
+
 <div class="row">
    <div class="col-md-12">
       <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -137,6 +278,53 @@
 </script>
 
 <div class="row">
+                        <div class="col-md-12">
+                            <!-- BEGIN EXAMPLE TABLE PORTLET-->
+                            <div class="portlet light bordered">
+                            
+                              <!--  <div class="portlet-title">
+                                    <div class="caption font-dark">
+                                        <span class="caption-subject bold uppercase"></span>
+                                    </div>
+                                </div> -->
+                                <div class="portlet-body">
+                                   <form action="index.php?module=registros&method=retornos" method="post" name="forms" class="form-horizontal" enctype="multipart/form-data">
+                                      <input type="hidden" name="q" value="1">
+                                                 <div class="row">
+                                                    
+                                                    
+                                                 <div class="col-md-2">
+                                                   Data Inicial: <input type="date" placeholder="DD/MM/YYYY" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" name="data_de" maxlength="10" class="form-control form-control-inline" id="data_de" value="{data_de}">
+                                                 </div>                                      
+                                                <div class="col-md-2">
+                                                   Data Final:<input type="date" placeholder="DD/MM/YYYY" pattern="(?:19|20)[0-9]{2}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1[0-9]|2[0-9])|(?:(?!02)(?:0[1-9]|1[0-2])-(?:30))|(?:(?:0[13578]|1[02])-31))" name="data_ate" maxlength="10" class="form-control form-control-inline" id="data_ate" value="{data_ate}">
+                                                 </div>
+                                                    
+
+                                                <div class="col-md-2">
+                                                   Entregador: <br><select name="id_entregador" class="form-control select2 select2-hidden-accessible" tabindex="-1" aria-hidden="true">
+                                                      {listagem_entregadores}
+                                                   </select>
+                                                 </div>
+                                                 
+                                                 <div class="col-md-2"><br>
+                                                   <button type="submit" class="btn green">Filtrar Resultados</button>
+                                                     </div>       
+                                                 
+                                                 
+                                                 </div>
+
+                                                   
+                                   </form>
+                                   
+                                </div>
+                            </div>
+                            <!-- END EXAMPLE TABLE PORTLET-->
+                        </div>
+                    </div>
+
+
+<div class="row">
    <div class="col-md-12">
       <!-- BEGIN EXAMPLE TABLE PORTLET-->
       <br>
@@ -155,6 +343,6 @@
       <!-- END EXAMPLE TABLE PORTLET-->
    </div>
 </div>
-
+{modals}
 
 <!-- END retornos -->

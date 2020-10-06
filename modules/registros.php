@@ -264,6 +264,20 @@ require_once("modules/home.php");
 			
 			$db = new db();
 			$db2 = new db();
+         
+                     if(isset($_REQUEST['data_de']))
+                     {
+                        $data_de = $_REQUEST['data_de'];
+                        $data_ate = $_REQUEST['data_ate'];
+                     }
+                     else
+                     {
+                        $data_de = date('Y-m-d', strtotime(date("Y-m-d"). ' - 15 days'));
+
+                        $data_ate = date("Y-m-d");        
+                     }
+         
+         
 
 			$sql = "SELECT
                               registros.id AS id_registro
@@ -283,7 +297,17 @@ require_once("modules/home.php");
                            INNER JOIN veiculos 
                                ON (registros.id_veiculo = veiculos.id)
                            INNER JOIN veiculos_marcas 
-                               ON (veiculos.id_marca = veiculos_marcas.id)";
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE  registros.data_registro BETWEEN '".$data_de."' AND '".$data_ate."' ";
+         
+                            if(isset($_REQUEST['id_entregador']) && $_REQUEST['id_entregador'] != "0")
+                            {
+                               $sql .= " AND registros.id_entregador = ".$_REQUEST['id_entregador']." ";
+                            }
+                            
+                            $sql .= " ORDER BY registros.id DESC";
+                            
+         
+         
 			$db->query($sql,__LINE__,__FILE__);
 			$db->next_record();
 			
@@ -345,6 +369,32 @@ require_once("modules/home.php");
 			}
 
       
+                      $sql = "select id, nome from entregadores";
+                     $db->query($sql,__LINE__,__FILE__);
+                     $db->next_record();
+
+			$listagem_entregadores = "<option value='0' selected>- TODOS -</option>";
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$listagem_entregadores .= "<option value='".$db->f("id")."' ";
+				
+				if($db->f("id") == $_REQUEST['id_entregador'])
+					$listagem_entregadores .= "selected='selected'";
+				
+				$listagem_entregadores .= ">".$db->f("nome")."</option>";			
+	
+				$db->next_record();
+
+			}
+
+            $date = new DateTime($data_de);
+            $data_de_format =  $date->format('d/m/Y');
+
+            $date = new DateTime($data_ate);
+            $data_ate_format =  $date->format('d/m/Y');
+         
+             $grid = montaGrid("sample_1",$listagem,"financeiro");
       
              $grid = montaGrid("sample_1",$listagem,"entrega");
 
@@ -352,6 +402,16 @@ require_once("modules/home.php");
 		$GLOBALS["base"]->template = new template();       
 		
 		$GLOBALS["base"]->template->set_var("grid",$grid);
+      
+		$GLOBALS["base"]->template->set_var("listagem_entregadores",$listagem_entregadores);
+
+		$GLOBALS["base"]->template->set_var("data_de",$data_de);
+		$GLOBALS["base"]->template->set_var("data_ate",$data_ate);
+      
+		$GLOBALS["base"]->template->set_var("data_de_format",$data_de_format);
+		$GLOBALS["base"]->template->set_var("data_ate_format",$data_ate_format);
+
+      
 													
 		$GLOBALS["base"]->write_design_specific('registros.tpl' , 'entrega');                       
 		$GLOBALS["base"]->template = new template();                                                  
@@ -370,64 +430,92 @@ require_once("modules/home.php");
 			
 			$db = new db();
 			$db2 = new db();
+			$db3 = new db();
          
                   
                      $valor_diaria = 150.00;
+                     
+                     if(isset($_REQUEST['data_de']))
+                     {
+                        $data_de = $_REQUEST['data_de'];
+                        $data_ate = $_REQUEST['data_ate'];
+                     }
+                     else
+                     {
+                        $data_de = date('Y-m-d', strtotime(date("Y-m-d"). ' - 15 days'));
+
+                        $data_ate = date("Y-m-d");        
+                     }
          
 
-			$sql = "SELECT
-                              registros.id AS id_registro
-                            , registros.volumes AS volumes
-                           , entregadores.nome AS entregador
-                           , veiculos.photo AS photo
-                           , veiculos.placa AS placa
-                           , veiculos.modelo AS modelo
-                           , veiculos_marcas.nome AS marca
-                           , DATE_FORMAT(registros.data_registro,'%d/%m/%Y') AS data_registro
-                           , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro
-                           FROM
-                           registros
-                           INNER JOIN entregadores 
-                               ON (registros.id_entregador = entregadores.id)
-                           INNER JOIN veiculos 
-                               ON (registros.id_veiculo = veiculos.id)
-                           INNER JOIN veiculos_marcas 
-                               ON (veiculos.id_marca = veiculos_marcas.id) GROUP BY registros.data_registro";
+			$sql = "SELECT entregadores.id AS id_entregador, 
+                     entregadores.nome AS nome_entregador 
+                     FROM entregadores ORDER BY entregadores.nome ASC";
 			$db->query($sql,__LINE__,__FILE__);
 			$db->next_record();
 			
 			for($i = 0; $i < $db->num_rows(); $i++)
 			{
                            $retornados = 0;
+                           $entregues = 0;
             
-				$id_registro = $db->f("id_registro");			
-				$entregador = $db->f("entregador");			
-				$marca = $db->f("marca");			
-				$placa = $db->f("placa");			
-				$modelo = $db->f("modelo");			
-				$photo = $db->f("photo");			
-				$data_registro = $db->f("data_registro");			
-				$hora_registro = $db->f("hora_registro");			
-				$volumes = $db->f("volumes");			
+				$id_entregador = $db->f("id_entregador");			
+				$nome_entregador = $db->f("nome_entregador");		
             
+                           $dias_trabalhados = 0;
+
             
-                        $sql2 = "SELECT id_retorno FROM registros_retornos WHERE id_saida = ".$id_registro." ";
+                        $sql2 = "SELECT COUNT(id) AS total, 
+                        SUM(volumes) AS total_volumes,
+                        id AS id_registro 
+                        FROM registros WHERE id_entregador = ".$id_entregador."
+                        AND tipo = 1
+                        AND data_registro BETWEEN '".$data_de."' AND '".$data_ate."' ";
+                        
+                        if(isset($_REQUEST['id_entregador']) && $_REQUEST['id_entregador'] != "0")
+                        {
+                           $sql2 .= " AND registros.id_entregador = ".$_REQUEST['id_entregador']." ";
+                        }
+
+                        $sql2 .= " GROUP BY registros.data_registro";
+                        
+                        
                         $db2->query($sql2,__LINE__,__FILE__);
                         $db2->next_record();
-                        if($db2->num_rows() > 0)
-                        {
-                           $sql2 = "SELECT volumes FROM registros WHERE id = ".$db2->f("id_retorno")." ";
-                           $db2->query($sql2,__LINE__,__FILE__);
-                           $db2->next_record();
+			for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+			{
+                            $dias_trabalhados += $db2->f("total");
+                            
+
+                            
+                           $sql3 = "SELECT id_retorno FROM registros_retornos WHERE id_saida = ".$db2->f("id_registro")." ";
+                           $db3->query($sql3,__LINE__,__FILE__);
+                           $db3->next_record();
+                           if($db3->num_rows() > 0)
+                           {
+                              
+                              $sql3 = "SELECT volumes FROM registros WHERE id = ".$db3->f("id_retorno")." AND tipo = 2 ";
+                              $db3->query($sql3,__LINE__,__FILE__);
+                              $db3->next_record();
+                              $retornados += $db3->f("volumes");
+                              
+                           }
                            
-                           $retornados = $db2->f("volumes");
-                        }   
-            
+                           
+                        if($db2->f("total_volumes") > 0)
+                           $entregues += $db2->f("total_volumes")-$retornados;
+                            
+                             
+                           $db2->next_record();
+                     }
+                        
+                        $apagar = $dias_trabalhados*$valor_diaria;
+                        
 
 				$listagem .= '<tr> 
-										<td>'.$entregador.'</td>
-										<td>'.$data_registro.' </td> 
-										<td>'.$volumes.'</td> 
+										<td>'.$nome_entregador.'</td>
+										<td>'.$dias_trabalhados.' </td> 
+										<td>'.$entregues.'</td> 
 										<td>'.$retornados.'</td> 
 										<td>R$ '.  $this->decimal_to_brasil_real($apagar).'</td> 
 									</tr>';
@@ -439,14 +527,46 @@ require_once("modules/home.php");
 			}
 
       
-      
+                      $sql = "select id, nome from entregadores";
+                     $db->query($sql,__LINE__,__FILE__);
+                     $db->next_record();
+
+			$listagem_entregadores = "<option value='0' selected>- TODOS -</option>";
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$listagem_entregadores .= "<option value='".$db->f("id")."' ";
+				
+				if($db->f("id") == $_REQUEST['id_entregador'])
+					$listagem_entregadores .= "selected='selected'";
+				
+				$listagem_entregadores .= ">".$db->f("nome")."</option>";			
+	
+				$db->next_record();
+
+			}
+
+            $date = new DateTime($data_de);
+            $data_de_format =  $date->format('d/m/Y');
+
+            $date = new DateTime($data_ate);
+            $data_ate_format =  $date->format('d/m/Y');
+         
              $grid = montaGrid("sample_1",$listagem,"financeiro");
 
 		$this->cabecalho();                                                                            
 		$GLOBALS["base"]->template = new template();       
 		
 		$GLOBALS["base"]->template->set_var("grid",$grid);
-													
+		$GLOBALS["base"]->template->set_var("listagem_entregadores",$listagem_entregadores);
+
+		$GLOBALS["base"]->template->set_var("data_de",$data_de);
+		$GLOBALS["base"]->template->set_var("data_ate",$data_ate);
+      
+		$GLOBALS["base"]->template->set_var("data_de_format",$data_de_format);
+		$GLOBALS["base"]->template->set_var("data_ate_format",$data_ate_format);
+
+      
 		$GLOBALS["base"]->write_design_specific('registros.tpl' , 'financeiro');                       
 		$GLOBALS["base"]->template = new template();                                                  
 		$this->footer();                                                                           
@@ -465,6 +585,19 @@ require_once("modules/home.php");
 			
 			$db = new db();
 			$db2 = new db();
+         
+                     if(isset($_REQUEST['data_de']))
+                     {
+                        $data_de = $_REQUEST['data_de'];
+                        $data_ate = $_REQUEST['data_ate'];
+                     }
+                     else
+                     {
+                        $data_de = date('Y-m-d', strtotime(date("Y-m-d"). ' - 15 days'));
+
+                        $data_ate = date("Y-m-d");        
+                     }
+         
 
 			$sql = "SELECT
                               registros.id AS id_registro
@@ -483,7 +616,15 @@ require_once("modules/home.php");
                            INNER JOIN veiculos 
                                ON (registros.id_veiculo = veiculos.id)
                            INNER JOIN veiculos_marcas 
-                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 1";
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 1 AND data_registro BETWEEN '".$data_de."' AND '".$data_ate."' ";
+         
+                            if(isset($_REQUEST['id_entregador']) && $_REQUEST['id_entregador'] != "0")
+                            {
+                               $sql .= " AND registros.id_entregador = ".$_REQUEST['id_entregador']." ";
+                            }
+                            
+                            $sql .= " ORDER BY registros.id DESC";
+         
 			$db->query($sql,__LINE__,__FILE__);
 			$db->next_record();
 			
@@ -516,12 +657,46 @@ require_once("modules/home.php");
 			}
 
       
+                      $sql = "select id, nome from entregadores";
+                     $db->query($sql,__LINE__,__FILE__);
+                     $db->next_record();
+
+			$listagem_entregadores = "<option value='0' selected>- TODOS -</option>";
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$listagem_entregadores .= "<option value='".$db->f("id")."' ";
+				
+				if($db->f("id") == $_REQUEST['id_entregador'])
+					$listagem_entregadores .= "selected='selected'";
+				
+				$listagem_entregadores .= ">".$db->f("nome")."</option>";			
+	
+				$db->next_record();
+
+			}
+
+            $date = new DateTime($data_de);
+            $data_de_format =  $date->format('d/m/Y');
+
+            $date = new DateTime($data_ate);
+            $data_ate_format =  $date->format('d/m/Y');
       
              $grid = montaGrid("sample_1",$listagem,"saidas");
 
 		$this->cabecalho();                                                                            
 		$GLOBALS["base"]->template = new template();       
-		
+
+      		$GLOBALS["base"]->template->set_var("listagem_entregadores",$listagem_entregadores);
+
+		$GLOBALS["base"]->template->set_var("data_de",$data_de);
+		$GLOBALS["base"]->template->set_var("data_ate",$data_ate);
+      
+		$GLOBALS["base"]->template->set_var("data_de_format",$data_de_format);
+		$GLOBALS["base"]->template->set_var("data_ate_format",$data_ate_format);
+
+
+      
 		$GLOBALS["base"]->template->set_var("grid",$grid);
 													
 		$GLOBALS["base"]->write_design_specific('registros.tpl' , 'saidas');                       
@@ -541,16 +716,34 @@ require_once("modules/home.php");
 			
 			$db = new db();
 			$db2 = new db();
+			$db3 = new db();
+         
+         
+                     if(isset($_REQUEST['data_de']))
+                     {
+                        $data_de = $_REQUEST['data_de'];
+                        $data_ate = $_REQUEST['data_ate'];
+                     }
+                     else
+                     {
+                        $data_de = date('Y-m-d', strtotime(date("Y-m-d"). ' - 15 days'));
+
+                        $data_ate = date("Y-m-d");        
+                     }
 
 			$sql = "SELECT
                               registros.id AS id_registro
                             , registros.volumes AS volumes
                             , registros.obs AS obs
+                            , registros.id_entregador AS id_entregador
                            , entregadores.nome AS entregador
                            , veiculos.photo AS photo
+                           , registros.id_veiculo AS id_veiculo
                            , veiculos.placa AS placa
                            , veiculos.modelo AS modelo
                            , veiculos_marcas.nome AS marca
+                           , DATE_FORMAT(registros.data_registro,'%Y-%m-%d') AS data_registro_raw
+                           , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro_raw
                            , DATE_FORMAT(registros.data_registro,'%d/%m/%Y') AS data_registro
                            , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro
                            FROM
@@ -560,7 +753,15 @@ require_once("modules/home.php");
                            INNER JOIN veiculos 
                                ON (registros.id_veiculo = veiculos.id)
                            INNER JOIN veiculos_marcas 
-                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 2";
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 2  AND data_registro BETWEEN '".$data_de."' AND '".$data_ate."' ";
+         
+                            if(isset($_REQUEST['id_entregador']) && $_REQUEST['id_entregador'] != "0")
+                            {
+                               $sql .= " AND registros.id_entregador = ".$_REQUEST['id_entregador']." ";
+                            }
+                            
+                            $sql .= " ORDER BY registros.id DESC";
+         
 			$db->query($sql,__LINE__,__FILE__);
 			$db->next_record();
 			
@@ -576,6 +777,10 @@ require_once("modules/home.php");
 				$hora_registro = $db->f("hora_registro");			
 				$volumes = $db->f("volumes");			
 				$obs = $db->f("obs");			
+				$id_entregador = $db->f("id_entregador");			
+				$id_veiculo = $db->f("id_veiculo");			
+				$data_registro_raw = $db->f("data_registro_raw");			
+				$hora_registro_raw = $db->f("hora_registro_raw");			
 
 				$listagem .= '<tr> 
 										<td>'.$entregador.'</td>
@@ -584,17 +789,136 @@ require_once("modules/home.php");
 										<td>'.$data_registro.'</td> 
 										<td>'.$hora_registro.'</td> 
 										<td>'.nl2br($obs).'</td> 
-                                                                  <td align="center"><a href="" ><button class="btn blue" >Ver Saída</button></a></td>
+                                                                  <td align="center"> <a data-toggle="modal" href="#modal_'.$id_registro.'" onclick="javascript:void(0);" ><button class="btn blue" >Ver Saída</button></a></td>
                                                                   <td align="center"><a href="index.php?module=registros&method=exclui&id='.$id_registro.'" onclick="return(confirm(\'Confirma excluir o registro?\'))"><i class="fa fa-trash"></i></a></td>
 									</tr>';
 				
+		               $form = montaForm("registro");
+                     
+                              $form =  str_replace("col-md-4", "col-md-9", $form);
+                              
+                             $form =  str_replace("{data_registro}", $data_registro_raw, $form);
+                             $form =  str_replace("{hora_registro}", $hora_registro_raw, $form);
+                             $form =  str_replace("1", $volumes, $form);
+                             $form =  str_replace("{obs}", $obs, $form);
+                             
+                      
+                             
+                     $sql2 = "SELECT
+                     veiculos.id AS id
+                     , veiculos.placa AS placa
+                     , veiculos.modelo AS modelo
+                     , veiculos_marcas.nome AS marca
+                     FROM
+                     veiculos
+                     INNER JOIN veiculos_marcas 
+                     ON (veiculos.id_marca = veiculos_marcas.id)";
+                     $db2->query($sql2,__LINE__,__FILE__);
+                     $db2->next_record();
+                     
+                             
+                    $listagem_veiculos_details = "<option value='0' selected>- SELECIONE -</option>";
+			
+			for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+			{
+				$listagem_veiculos_details .= "<option value='".$db2->f("id")."' ";
+            
+                              $sql3 = "SELECT * FROM entregadores_veiculos_fixos WHERE id_veiculo = ".$db2->f("id")." AND id_entregador = ".$id_entregador." ";
+                              $db3->query($sql3,__LINE__,__FILE__);
+                              $db3->next_record();
 				
+				if($db3->num_rows() > 0 || $id_veiculo == $db2->f("id_veiculo"))
+					$listagem_veiculos_details .= "selected='selected'";
 				
+				$listagem_veiculos_details .=  ">".$db2->f("marca")." ".$db2->f("modelo")." ".$db2->f("placa")."</option>";			
+	
+				$db2->next_record();
+
+			}
+
+                     $sql2 = "select id, nome from entregadores";
+                     $db2->query($sql2,__LINE__,__FILE__);
+                     $db2->next_record();
+
+			$listagem_entregadores_details = "<option value='0' selected>- SELECIONE -</option>";
+			
+			for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+			{
+				$listagem_entregadores_details .= "<option value='".$db2->f("id")."' ";
+				
+				if($db2->f("id") == $id_entregador)
+					$listagem_entregadores_details .= "selected='selected'";
+				
+				$listagem_entregadores_details .= ">".$db2->f("nome")."</option>";			
+	
+				$db2->next_record();
+
+			}
+
+               
+                           $veiculos = montaSelect("registro",$listagem_veiculos_details,1); 
+                           $entregadores = montaSelect("registro",$listagem_entregadores_details,2); 
+                           
+                           
+            
+            
+                           $modals .= '<div class="modal fade" id="modal_'.$id_registro.'" tabindex="-1" role="basic" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="height:auto !important;">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                    <h4 class="modal-title">Detalhes da Saída referente ao retorno</h4>
+                                                </div>
+                                                <div class="modal-body" style="width:100%;"> 
+                                                   <form action="index.php?module=registros&methodmain" method="post" name="editar"  class="form-horizontal" enctype="multipart/form-data">
+                                                   '.$entregadores.'
+                                                      '.$veiculos.'<div>
+                                          '.$form.'                                             
+                                                <div class="modal-footer">
+                                                <center>   
+
+                                                 <!--  <button type="submit" class="btn green" style="width:300px;">Continuar &rightarrow;</button><br><br>-->
+                                                    </center>
+                                                </form>
+                                      
+                                                   <button type="button" id="closemodal" class="btn dark btn-outline" data-dismiss="modal">Fechar</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>';
+            
+            
 				
 				$db->next_record();
 			}
 
-      
+                            $sql = "select id, nome from entregadores";
+                     $db->query($sql,__LINE__,__FILE__);
+                     $db->next_record();
+
+			$listagem_entregadores = "<option value='0' selected>- TODOS -</option>";
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+				$listagem_entregadores .= "<option value='".$db->f("id")."' ";
+				
+				if($db->f("id") == $_REQUEST['id_entregador'])
+					$listagem_entregadores .= "selected='selected'";
+				
+				$listagem_entregadores .= ">".$db->f("nome")."</option>";			
+	
+				$db->next_record();
+
+			}
+
+            $date = new DateTime($data_de);
+            $data_de_format =  $date->format('d/m/Y');
+
+            $date = new DateTime($data_ate);
+            $data_ate_format =  $date->format('d/m/Y');
+
       
              $grid = montaGrid("sample_1",$listagem,"retornos");
 
@@ -602,6 +926,17 @@ require_once("modules/home.php");
 		$GLOBALS["base"]->template = new template();       
 		
 		$GLOBALS["base"]->template->set_var("grid",$grid);
+		$GLOBALS["base"]->template->set_var("modals",$modals);
+      
+      		$GLOBALS["base"]->template->set_var("listagem_entregadores",$listagem_entregadores);
+
+		$GLOBALS["base"]->template->set_var("data_de",$data_de);
+		$GLOBALS["base"]->template->set_var("data_ate",$data_ate);
+      
+		$GLOBALS["base"]->template->set_var("data_de_format",$data_de_format);
+		$GLOBALS["base"]->template->set_var("data_ate_format",$data_ate_format);
+
+      
 													
 		$GLOBALS["base"]->write_design_specific('registros.tpl' , 'retornos');                       
 		$GLOBALS["base"]->template = new template();                                                  

@@ -20,7 +20,7 @@ require_once("modules/home.php");
                      entregadores.nome AS nome,
                      entregadores.celular AS celular,
                      entregadores.photo AS foto 
-                     FROM entregadores 
+                     FROM entregadores WHERE status = 1
                      ORDER BY entregadores.id DESC";
 			$db->query($sql,__LINE__,__FILE__);
 			$db->next_record();
@@ -735,6 +735,25 @@ require_once("modules/home.php");
       
       }
 	   
+   function exclui()
+   {
+      
+		@session_start();
+		$db = new db();
+
+
+            $id = blockrequest($_REQUEST['id']);
+            
+            
+            
+            $sql = "UPDATE  entregadores SET status = 0 WHERE id = ".$id." LIMIT 1 ";
+            $db->query($sql,__LINE__,__FILE__);
+            $db->next_record();
+
+      
+            $this->notificacao("Entregador ecluído com sucesso!", "green");
+            header("Location: " . ABS_LINK . "/entregadores");
+   }
       
 }                                                                                                     
 
