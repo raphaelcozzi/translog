@@ -468,7 +468,7 @@ class login
                
                $novaSenha = substr(md5(md5(time()).rand(6,9)),0,10);
                
-               $sql = "UPDATE usuarios SET senha = MD5('".$email."'), temp_key = ''  WHERE temp_key = '".$key."' AND email = '".$email."' LIMIT 1";
+               $sql = "UPDATE usuarios SET senha = MD5('".$novaSenha."'), temp_key = ''  WHERE temp_key = '".$key."' AND email = '".$email."' LIMIT 1";
                $db->query($sql,__LINE__,__FILE__);
                $db->next_record();
                
