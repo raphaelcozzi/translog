@@ -57,9 +57,8 @@
    
 </div>
 
-<div class="row">
+<!--<div class="row">
    <div class="col-md-12">
-      <!-- BEGIN EXAMPLE TABLE PORTLET-->
       <br>
       <div class="portlet light bordered">
          <div class="portlet-title">
@@ -73,9 +72,8 @@
             {grid_resumo_dia}
          </div>
       </div>
-      <!-- END EXAMPLE TABLE PORTLET-->
    </div>
-</div>
+</div> -->
 <div class="row">
    <div class="col-md-12">
       <!-- BEGIN EXAMPLE TABLE PORTLET-->
@@ -84,7 +82,7 @@
          <div class="portlet-title">
             <div class="caption font-dark">
                <i class="icon-list font-dark"></i>
-               <span class="caption-subject bold uppercase">Registros de Saídas do dia</span>
+               <span class="caption-subject bold uppercase">Saídas do dia</span>
             </div>
             <div class="tools"> </div>
          </div>
@@ -103,7 +101,7 @@
          <div class="portlet-title">
             <div class="caption font-dark">
                <i class="icon-list font-dark"></i>
-               <span class="caption-subject bold uppercase">Registros de Retornos do dia</span>
+               <span class="caption-subject bold uppercase">Retornos do dia</span>
             </div>
             <div class="tools"> </div>
          </div>
@@ -247,12 +245,12 @@
                               <ul class="dropdown-menu dropdown-menu-default">
                                  <li>
                                     <a href="meusdados">
-                                    <i class="icon-user"></i> Profile </a>
+                                    <i class="icon-user"></i> Meus Dados </a>
                                  </li>
                                  <li class="divider"> </li>
                                  <li>
                                     <a href="login/logout">
-                                    <i class="icon-key"></i> Logout </a>
+                                    <i class="icon-key"></i> Sair </a>
                                  </li>
                               </ul>
                            </li>

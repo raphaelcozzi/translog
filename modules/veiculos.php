@@ -44,13 +44,22 @@ require_once("modules/home.php");
                            {
                               $entregador = $db2->f("entregador");
                            }
+                           
+                           if(strlen($photo) > 6)
+                           {
+                              $picture = '<img src="'.ABS_LINK.''.$photo.'" width="150">';
+                           }
+                           else
+                           {
+                              $picture = '<img src="http://www.placehold.it/150x150/EFEFEF/AAAAAA&text=sem+foto">';
+                           }
 
 				$listagem .= '<tr> 
 										<td>'.$placa.'</td>
 										<td>'.$marca.'</td>
 										<td>'.$tipo.'</td> 
 										<td>'.$entregador.'</td> 
-										<td><img src="'.ABS_LINK.''.$photo.'" width="150"></td> 
+										<td>'.$picture.'</td> 
 										<td><a href="index.php?module=veiculos&method=edita&id='.$db->f("id").'" >Editar</a></td>
 										<td><a href="index.php?module=veiculos&method=exclui&id='.$db->f("id").'" onclick="return(confirm(\'Confirma excluir o veiculo '.$db->f("nome").' ? \'))">Excluir</a></td>										
 									</tr>';
@@ -629,6 +638,25 @@ require_once("modules/home.php");
 		$GLOBALS["base"]->template->set_var('marcas',$marcas);
 		$GLOBALS["base"]->template->set_var('combustiveis',$combustiveis);
 		$GLOBALS["base"]->template->set_var('entregadores',$entregadores);
+      
+      
+               if(strlen($photo) > 6)
+               {
+                  $photo = '<img src="'.ABS_LINK.''.$photo.'" width="400">';
+               }
+               else
+               {
+                  $photo = '<img src="http://www.placehold.it/400x400/EFEFEF/AAAAAA&text=sem+foto">';
+               }
+               
+               if(strlen($photo_documento) > 6)
+               {
+                  $photo_documento = '<img src="'.ABS_LINK.''.$photo_documento.'" width="400">';
+               }
+               else
+               {
+                  $photo_documento = '<img src="http://www.placehold.it/400x400/EFEFEF/AAAAAA&text=sem+foto+de+CRLV">';
+               }
       
       
 		$GLOBALS["base"]->template->set_var('photo',$photo);

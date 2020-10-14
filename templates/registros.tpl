@@ -12,6 +12,7 @@
          <div class="form-body">
             {entregadores}
             {veiculos}
+            {diarias}
             {form}
          </div>
          <div class="form-actions">

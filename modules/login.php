@@ -205,7 +205,7 @@ class login
 
 				$saudacao = "Bem-vindo, ";
 
-				$this->notificacao($saudacao . ", " . $_SESSION['nome'] . " ", "green");
+				$this->notificacao($saudacao . " " . $_SESSION['nome'] . " ", "green");
 				header("Location: " . ABS_LINK);
 			}
 		}

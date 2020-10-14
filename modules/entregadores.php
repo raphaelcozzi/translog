@@ -47,14 +47,35 @@ require_once("modules/home.php");
                            if($db2->num_rows() > 0)
                            {
                               $veiculo = $db2->f("placa");
-                              $photo_veiculo = '<img src="'.ABS_LINK.''.$db2->f("photo").'" width="150">';
+                              $photo_veiculo = $db2->f("photo");
                            }
+                           
+                           
+                           if(strlen($photo_veiculo) > 6)
+                           {
+                              $picture_veiculo = '<img src="'.ABS_LINK.''.$photo_veiculo.'" width="150">';
+                           }
+                           else
+                           {
+                              $picture_veiculo = '<img src="http://www.placehold.it/150x150/EFEFEF/AAAAAA&text=sem+foto">';
+                           }
+                           
 
+                           if(strlen($photo) > 6)
+                           {
+                              $picture = '<img src="'.ABS_LINK.''.$photo.'" width="150">';
+                           }
+                           else
+                           {
+                              $picture = '<img src="http://www.placehold.it/150x150/EFEFEF/AAAAAA&text=sem+foto">';
+                           }
+                           
+                           
 				$listagem .= '<tr> 
 										<td>'.$nome.'</td>
 										<td>'.$celular.'</td>
-										<td><img src="'.ABS_LINK.''.$photo.'" width="150"></td> 
-										<td align="center">'.$veiculo.'<br>'.$photo_veiculo.'</td>
+										<td>'.$picture.'</td> 
+										<td align="center">'.$veiculo.'<br>'.$picture_veiculo.'</td>
 										<td><a href="index.php?module=entregadores&method=edita&id='.$db->f("id").'" >Editar</a></td>
 										<td><a href="index.php?module=entregadores&method=exclui&id='.$db->f("id").'" onclick="return(confirm(\'Confirma excluir o entregador  '.$db->f("nome").' ? \'))">Excluir</a></td>										
 									</tr>';
@@ -334,6 +355,7 @@ require_once("modules/home.php");
 		$numero_cnh = blockrequest($_REQUEST['numero_cnh']);
 		$validade_documento = blockrequest($_REQUEST['validade_documento']);
 		$obs = addslashes(blockrequest($_REQUEST['obs']));
+		$dados_bancarios = addslashes(blockrequest($_REQUEST['dados_bancarios']));
 
            $sql = "INSERT INTO entregadores
                (nome,
@@ -354,7 +376,8 @@ require_once("modules/home.php");
                status,
                dataCadastro,
                entrada,
-               saida)
+               saida, 
+               dados_bancarios)
                VALUES ('".$nome."',
                '".$email."',
                '".$celular."',
@@ -373,7 +396,8 @@ require_once("modules/home.php");
                1,
                NOW(),
                '".$entrada."',
-               '".$saida."')";
+               '".$saida."', 
+               '".$dados_bancarios."')";
             $db->query($sql,__LINE__,__FILE__);
             $db->next_record();
 
@@ -470,6 +494,7 @@ require_once("modules/home.php");
                   photo_documento,
                   numero_cnh,
                   obs,
+                  dados_bancarios,
                   validade_documento,
                   entrada,
                   saida
@@ -494,6 +519,7 @@ require_once("modules/home.php");
                   $photo_documento = $db->f("photo_documento");
                   $numero_cnh = $db->f("numero_cnh");
                   $obs = $db->f("obs");
+                  $dados_bancarios = $db->f("dados_bancarios");
                   $validade_documento = $db->f("validade_documento");
                   $entrada = $db->f("entrada");
                   $saida = $db->f("saida");
@@ -606,6 +632,28 @@ require_once("modules/home.php");
             $GLOBALS["base"]->template->set_var('numero_cnh',$numero_cnh);
             $GLOBALS["base"]->template->set_var('validade_documento',$validade_documento);
             $GLOBALS["base"]->template->set_var('obs',$obs);
+            $GLOBALS["base"]->template->set_var('dados_bancarios',$dados_bancarios);
+            
+            
+               if(strlen($photo) > 6)
+               {
+                  $photo = '<img src="'.ABS_LINK.''.$photo.'" width="400">';
+               }
+               else
+               {
+                  $photo = '<img src="http://www.placehold.it/400x400/EFEFEF/AAAAAA&text=sem+foto">';
+               }
+               
+               if(strlen($photo_documento) > 6)
+               {
+                  $photo_documento = '<img src="'.ABS_LINK.''.$photo_documento.'" width="400">';
+               }
+               else
+               {
+                  $photo_documento = '<img src="http://www.placehold.it/400x400/EFEFEF/AAAAAA&text=sem+foto+de+CNH">';
+               }
+               
+            
             
             $GLOBALS["base"]->template->set_var('photo',$photo);
             $GLOBALS["base"]->template->set_var('photo_documento',$photo_documento);
@@ -645,6 +693,7 @@ require_once("modules/home.php");
 		$numero_cnh = blockrequest($_REQUEST['numero_cnh']);
 		$validade_documento = blockrequest($_REQUEST['validade_documento']);
 		$obs = addslashes(blockrequest($_REQUEST['obs']));
+		$dados_bancarios = addslashes(blockrequest($_REQUEST['dados_bancarios']));
          
          
                $sql = "UPDATE entregadores
@@ -662,6 +711,7 @@ require_once("modules/home.php");
                               rg = '".$rg."',
                               numero_cnh = '".$numero_cnh."',
                               obs = '".$obs."',
+                              dados_bancarios = '".$dados_bancarios."',
                               validade_documento = '".$validade_documento."',
                               entrada = '".$entrada."',
                               saida = '".$saida."'

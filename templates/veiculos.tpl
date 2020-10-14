@@ -82,13 +82,13 @@
             
             <div class="row">
                <div class="col-md-4 col-md-offset-3">
-                  <img src="{photo}" style="width:400px;">
+                  {photo}
                </div>
             </div>
-            
+               <br>
             <div class="row">
                 <div class="col-md-4 col-md-offset-3">
-                  <img src="{photo_documento}" style="width:400px;">
+                  {photo_documento}
                </div>
             </div>
             
