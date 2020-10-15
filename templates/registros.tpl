@@ -119,7 +119,13 @@
       return 0;
    }
 </script>
-
+<style type="text/css">
+   .dt-buttons
+   {
+      display:none;
+   }
+   
+</style>
 
 <div class="row">
                         <div class="col-md-12">
@@ -166,8 +172,14 @@
                             <!-- END EXAMPLE TABLE PORTLET-->
                         </div>
                     </div>
+                                                   
+                                                   
 <div class="row">
    <div class="col-md-12">
+      
+      <div>
+         <a href="index.php?module=registros&method=export&data_de={data_de}&data_ate={data_ate}&id_entregador={id_entregador}" target="_blank"><button type="button" class="btn red">Exportar Relatório</button></a>
+      </div>
       <!-- BEGIN EXAMPLE TABLE PORTLET-->
       <br>
       <div class="portlet light bordered">
@@ -176,7 +188,8 @@
                <i class="icon-list font-dark"></i>
                <span class="caption-subject bold uppercase">Relatório Financeiro - Período: {data_de_format} - {data_ate_format}</span>
             </div>
-            <div class="tools"> </div>
+            
+            <div class="tools"></div>
          </div>
          <div class="portlet-body">
             {grid}

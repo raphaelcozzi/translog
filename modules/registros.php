@@ -466,7 +466,6 @@ require_once("modules/home.php");
 			$db4 = new db();
          
                   
-                     $valor_diaria = 150.00;
                      
                      if(isset($_REQUEST['data_de']))
                      {
@@ -491,6 +490,8 @@ require_once("modules/home.php");
 			{
                            $retornados = 0;
                            $entregues = 0;
+                           $valor_diaria = 0;
+
             
 				$id_entregador = $db->f("id_entregador");			
 				$nome_entregador = $db->f("nome_entregador");		
@@ -501,15 +502,21 @@ require_once("modules/home.php");
             
                         $sql2 = "SELECT COUNT(id) AS total, 
                         SUM(volumes) AS total_volumes,
+                        SUM(diaria) AS diaria,
                         id AS id_registro 
                         FROM registros WHERE id_entregador = ".$id_entregador."
                         AND tipo = 1
-                        AND id IN(SELECT DISTINCT(id_saida) FROM registros_retornos)
+                       /*  AND id IN(SELECT DISTINCT(id_saida) FROM registros_retornos) */
                         AND data_registro BETWEEN '".$data_de."' AND '".$data_ate."' ";
                         
                         if(isset($_REQUEST['id_entregador']) && $_REQUEST['id_entregador'] != "0")
                         {
+                           $id_entregador_pesquisa = $_REQUEST['id_entregador'];
                            $sql2 .= " AND registros.id_entregador = ".$_REQUEST['id_entregador']." ";
+                        }
+                        else
+                        {
+                           $id_entregador_pesquisa = "0";
                         }
 
                         $sql2 .= " GROUP BY EXTRACT(DAY FROM registros.data_registro)";
@@ -517,11 +524,41 @@ require_once("modules/home.php");
                         
                         $db2->query($sql2,__LINE__,__FILE__);
                         $db2->next_record();
+                        $dias_trabalhados = $db2->num_rows();
+                        
                         for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
                         {
-                                    $dias_trabalhados += $db2->f("total");
+                                    $valor_diaria  += $db2->f("diaria");
 
 
+                                   
+                                if($db2->f("total_volumes") > 0)
+                                   $entregues += $db2->f("total_volumes");
+
+
+
+                                          $db2->next_record();
+                        }
+                                
+                                
+                                
+            
+                        $sql2 = "SELECT id AS id_registro 
+                        FROM registros WHERE id_entregador = ".$id_entregador."
+                        AND tipo = 1
+                       /*  AND id IN(SELECT DISTINCT(id_saida) FROM registros_retornos) */
+                        AND data_registro BETWEEN '".$data_de."' AND '".$data_ate."' ";
+                        
+                        if(isset($_REQUEST['id_entregador']) && $_REQUEST['id_entregador'] != "0")
+                        {
+                           $sql2 .= " AND registros.id_entregador = ".$_REQUEST['id_entregador']." ";
+                        }
+
+                        $db2->query($sql2,__LINE__,__FILE__);
+                        $db2->next_record();
+                        
+                        for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+                        {
 
                                    $sql3 = "SELECT id_retorno FROM registros_retornos WHERE id_saida = ".$db2->f("id_registro")." ";
                                    $db3->query($sql3,__LINE__,__FILE__);
@@ -536,26 +573,16 @@ require_once("modules/home.php");
 
                                    }
 
-                           /*
-                                if($db2->f("total_volumes") > 0)
-                                   $entregues += $db2->f("total_volumes")-$retornados;
-                           */
-                                   
-                                if($db2->f("total_volumes") > 0)
-                                   $entregues += $db2->f("total_volumes");
-
-                                     $sql4 = "SELECT diaria  FROM registros WHERE id = ".$db2->f("id_registro")." ";
-                                      $db4->query($sql4,__LINE__,__FILE__);
-                                      $db4->next_record();
-                                      $valor_diaria = $db4->f("diaria");
-
 
                                           $db2->next_record();
                                 }
-                     
+                                
+                                
+                                
+                     $entregues = $entregues-$retornados;
                      
                         
-                        $apagar = $dias_trabalhados*$valor_diaria;
+                        $apagar = $valor_diaria;
                         
 
 				$listagem .= '<tr> 
@@ -604,6 +631,7 @@ require_once("modules/home.php");
 		
 		$GLOBALS["base"]->template->set_var("grid",$grid);
 		$GLOBALS["base"]->template->set_var("listagem_entregadores",$listagem_entregadores);
+		$GLOBALS["base"]->template->set_var("id_entregador",$id_entregador_pesquisa);
 
 		$GLOBALS["base"]->template->set_var("data_de",$data_de);
 		$GLOBALS["base"]->template->set_var("data_ate",$data_ate);
@@ -793,6 +821,7 @@ require_once("modules/home.php");
 			$sql = "SELECT
                               registros.id AS id_registro
                             , registros.volumes AS volumes
+                            , registros.diaria AS diaria
                             , registros.obs AS obs
                             , registros.id_entregador AS id_entregador
                            , entregadores.nome AS entregador
@@ -840,6 +869,7 @@ require_once("modules/home.php");
 				$id_veiculo = $db->f("id_veiculo");			
 				$data_registro_raw = $db->f("data_registro_raw");			
 				$hora_registro_raw = $db->f("hora_registro_raw");			
+				$diaria = $db->f("diaria");			
 
 				$listagem .= '<tr> 
 										<td>'.$entregador.'</td>
@@ -946,9 +976,29 @@ require_once("modules/home.php");
 
 			}
 
-               
+                  
+                     $listagem_diarias = "";
+         
+                     $sql2 = "select id, valor from diarias ORDER BY ordem ASC";
+                     $db2->query($sql2,__LINE__,__FILE__);
+                     $db2->next_record();
+
+			for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+			{
+				$listagem_diarias .= "<option value='".$db2->f("valor")."' ";
+				
+				if($db2->f("valor") == $diaria)
+					$listagem_diarias .= "selected='selected'";
+				
+				$listagem_diarias .= ">".  $this->decimal_to_brasil_real($db2->f("valor"))."</option>";			
+	
+				$db2->next_record();
+
+			}
+
                            $veiculos = montaSelect("registro",$listagem_veiculos_details,1); 
                            $entregadores = montaSelect("registro",$listagem_entregadores_details,2); 
+                           $diarias = montaSelect("registro",$listagem_diarias,8); 
                            
                            
             
@@ -961,9 +1011,9 @@ require_once("modules/home.php");
                                                     <h4 class="modal-title">Detalhes da Saída referente ao retorno</h4>
                                                 </div>
                                                 <div class="modal-body" style="width:100%;"> 
-                                                   <form action="index.php?module=registros&methodmain" method="post" name="editar"  class="form-horizontal" enctype="multipart/form-data">
+                                                   <form action="index.php?module=registros&method=main" method="post" name="editar"  class="form-horizontal" enctype="multipart/form-data">
                                                    '.$entregadores.'
-                                                      '.$veiculos.'<div>
+                                                      '.$veiculos.' '.$diarias.'<div>
                                           '.$form.'                                             
                                                 <div class="modal-footer">
                                                 <center>   
@@ -1070,6 +1120,221 @@ require_once("modules/home.php");
                $this->notificacao("Registro excluído com sucesso!", "green");
                header("Location: " . ABS_LINK . "registros/retornos");
             }
+   }
+   
+   function export()
+   {
+         include("3rd_party/MPDF60/mpdf.php");
+         
+         
+            $report = '';
+         
+                              $_SESSION['page_title'] = "Relatório Financeiro";
+			
+			$db = new db();
+			$db2 = new db();
+			$db3 = new db();
+			$db4 = new db();
+         
+                  
+                     
+                     if(isset($_REQUEST['data_de']))
+                     {
+                        $data_de = $_REQUEST['data_de'];
+                        $data_ate = $_REQUEST['data_ate'];
+                     }
+                     else
+                     {
+                        $data_de = date('Y-m-d', strtotime(date("Y-m-d"). ' - 15 days'));
+
+                        $data_ate = date("Y-m-d");        
+                     }
+                     
+                     
+         
+                     $date = new DateTime($data_de);
+                     $data_de_format =  $date->format('d/m/Y');
+
+                     $date = new DateTime($data_ate);
+                     $data_ate_format =  $date->format('d/m/Y');
+         
+         
+                 $report .= '<table width="100%" border="0" style="border: 0px solid #e4e4e4; width:100%; font-family: Futura,Trebuchet MS,Arial,sans-serif; font-size:20px;" cellspacing="0" cellpadding="5" align="center">
+                              <tr>
+                                <td colspan="4"><img src="top_report.png" /></td>
+                              </tr>
+                           <tr>
+                                <td colspan="4" align="center">'.$data_de_format.' at&eacute; '.$data_ate_format.'</td>
+                              </tr>';                              
+                 
+                 
+                     
+         
+
+			$sql = "SELECT entregadores.id AS id_entregador, 
+                     entregadores.nome AS nome_entregador, 
+                     entregadores.dados_bancarios AS dados_bancarios 
+                     FROM entregadores ORDER BY entregadores.nome ASC";
+			$db->query($sql,__LINE__,__FILE__);
+			$db->next_record();
+			
+			for($i = 0; $i < $db->num_rows(); $i++)
+			{
+                           $retornados = 0;
+                           $entregues = 0;
+                           $valor_diaria = 0;
+
+            
+				$id_entregador = $db->f("id_entregador");			
+				$nome_entregador = $db->f("nome_entregador");		
+            
+                           $dias_trabalhados = 0;
+                           $faltando_entregar = 0;
+
+            
+                        $sql2 = "SELECT COUNT(id) AS total, 
+                        SUM(volumes) AS total_volumes,
+                        SUM(diaria) AS diaria,
+                        id AS id_registro 
+                        FROM registros WHERE id_entregador = ".$id_entregador."
+                        AND tipo = 1
+                       /*  AND id IN(SELECT DISTINCT(id_saida) FROM registros_retornos) */
+                        AND data_registro BETWEEN '".$data_de."' AND '".$data_ate."' ";
+                        
+                        if(isset($_REQUEST['id_entregador']) && $_REQUEST['id_entregador'] != "0")
+                        {
+                           $sql2 .= " AND registros.id_entregador = ".$_REQUEST['id_entregador']." ";
+                        }
+
+                        $sql2 .= " GROUP BY EXTRACT(DAY FROM registros.data_registro)";
+                        
+                        
+                        $db2->query($sql2,__LINE__,__FILE__);
+                        $db2->next_record();
+                        $dias_trabalhados = $db2->num_rows();
+                        
+                        for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+                        {
+                                    $valor_diaria  += $db2->f("diaria");
+
+
+                                   
+                                if($db2->f("total_volumes") > 0)
+                                   $entregues += $db2->f("total_volumes");
+
+
+
+                                          $db2->next_record();
+                        }
+                                
+                                
+                                
+            
+                        $sql2 = "SELECT id AS id_registro 
+                        FROM registros WHERE id_entregador = ".$id_entregador."
+                        AND tipo = 1
+                       /*  AND id IN(SELECT DISTINCT(id_saida) FROM registros_retornos) */
+                        AND data_registro BETWEEN '".$data_de."' AND '".$data_ate."' ";
+                        
+                        if(isset($_REQUEST['id_entregador']) && $_REQUEST['id_entregador'] != "0")
+                        {
+                           $sql2 .= " AND registros.id_entregador = ".$_REQUEST['id_entregador']." ";
+                        }
+
+                        $db2->query($sql2,__LINE__,__FILE__);
+                        $db2->next_record();
+                        
+                        for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+                        {
+
+                                   $sql3 = "SELECT id_retorno FROM registros_retornos WHERE id_saida = ".$db2->f("id_registro")." ";
+                                   $db3->query($sql3,__LINE__,__FILE__);
+                                   $db3->next_record();
+                                   if($db3->num_rows() > 0)
+                                   {
+
+                                      $sql3 = "SELECT volumes FROM registros WHERE id = ".$db3->f("id_retorno")." AND tipo = 2 ";
+                                      $db3->query($sql3,__LINE__,__FILE__);
+                                      $db3->next_record();
+                                      $retornados += $db3->f("volumes");
+
+                                   }
+
+
+                                          $db2->next_record();
+                                }
+                                
+                                
+                                
+                     $entregues = $entregues-$retornados;
+                     
+                        
+                        $apagar = $valor_diaria;
+                        
+				$report .= '<tr style="background-color:#B0C934; font-family: Futura,Trebuchet MS,Arial,sans-serif; font-size:12px;"> 
+										<td style="font-size:12px;">ENTREGADOR</td>
+										<td style="font-size:12px;">DIAS TRABALHADOS</td> 
+										<td style="font-size:12px;">VOLUMES ENTREGUES</td> 
+										<td style="font-size:12px;">TOTAL A PAGAR</td> 
+									</tr>';
+                        
+                        
+
+				$report .= '<tr> 
+										<td style="font-size:14px;">'.$nome_entregador.'</td>
+										<td style="font-size:14px;">'.$dias_trabalhados.' </td> 
+										<td style="font-size:14px;">'.$entregues.'</td> 
+										<td style="font-size:14px;">R$ '.  $this->decimal_to_brasil_real($apagar).'</td> 
+									</tr>';
+				
+				
+				
+                 $report .= '<tr>
+                                <td colspan="4"><img src="bg_top_report_pl_blue.png" /></td>
+                              </tr>';
+                 
+                 $report .= '<tr>
+                                <td colspan="4" style="font-size:14px;">'.nl2br($db->f("dados_bancarios")).'</td>
+                              </tr>';
+                 $report .= '<tr>
+                                <td colspan="4" style="font-size:14px; height:40px;">&nbsp;</td>
+                              </tr>';
+                 
+                 
+				
+				$db->next_record();
+			}
+
+         
+                 
+                 
+                 
+                 
+                 $report .= '</table>';
+                 
+                 
+         
+         
+         
+               echo '<script language="javascript">document.getElementById("overover").style.display="none";</script>';
+
+
+               //	$mpdf=new mPDF('c','A4-L','','',5,5,3,25,16,13); // LANDSCAPE
+               $mpdf=new mPDF('c','A4','','',5,5,3,25,16,13);
+
+               $mpdf->SetDisplayMode('fullpage');
+
+               $mpdf->list_indent_first_level = 0;	// 1 or 0 - whether to indent the first level of a list
+
+               $stylesheet = file_get_contents('mpdfstyletables.css');
+               $mpdf->WriteHTML($stylesheet,1);	// The parameter 1 tells that this is css/style only and no body/html/text
+
+               $mpdf->WriteHTML($report,2);
+               $mpdf->SetTitle ("Relatório Finaceiro - L4LOG - ".date("d/m/Y"));
+
+               $mpdf->Output('Relatório Financeiro - L4LOG.pdf',"I");
+               exit;
+ 
    }
    
    

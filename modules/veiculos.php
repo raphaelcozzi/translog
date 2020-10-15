@@ -695,20 +695,17 @@ require_once("modules/home.php");
          
          
                $sql = "UPDATE veiculos
-                     SET id_tipo = 'id_tipo',
-                       id_marca = 'id_marca',
-                       modelo = 'modelo',
-                       placa = 'placa',
-                       ano = 'ano',
-                       id_combustivel = 'id_combustivel',
-                       photo = 'photo',
-                       photo_documento = 'photo_documento',
-                       numero_documento = 'numero_documento',
-                       obs = 'obs',
-                       validade_documento = 'validade_documento',
-                       STATUS = 'status',
-                       dataCadastro = 'dataCadastro',
-                       km_inicial = 'km_inicial'
+                     SET id_tipo = ".$id_tipo.",
+                       id_marca = ".$id_marca.",
+                       modelo = '".$modelo."',
+                       placa = '".$placa."',
+                       ano = '".$ano."',
+                       id_combustivel = ".$id_combustivel.",
+                       numero_documento = '".$numero_documento."',
+                       obs = '".addslashes($obs)."',
+                       validade_documento = '".$validade_documento."',
+                       status = 1,
+                       km_inicial = '".$km_inicial."'
                      WHERE id =".$id_veiculo." ";
                $db->query($sql,__LINE__,__FILE__);
                $db->next_record();

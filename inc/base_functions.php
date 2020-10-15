@@ -488,6 +488,10 @@ function montaForm($form)
                    if(strlen($db->f("campo_min")) > 0)
                       $form_content .= ' min="'.$db->f("campo_min").'" ';
 
+                   if(strlen($db->f("campo_onkeypress")) > 3)
+                      $form_content .= ' onKeyPress="'.$db->f("campo_onkeypress").'" ';
+                   
+                   
                   $form_content .= '>
                      <span class="help-block"></span>
                   </div>
@@ -550,6 +554,10 @@ function montaForm($form)
 
                    if(strlen($db->f("campo_value")) > 3)
                       $form_content .= ' value="'.$db->f("campo_value").'" ';
+                   
+                   if(strlen($db->f("campo_onkeypress")) > 3)
+                      $form_content .= ' onKeyPress="'.$db->f("campo_onkeypress").'" ';
+                   
 
 
                   $form_content .= '>
@@ -603,6 +611,10 @@ function montaForm($form)
 
                    if(strlen($db->f("campo_selected")) > 3)
                       $form_content .= ' selected="'.$db->f("campo_selected").'" ';
+                   
+                   
+                   if(strlen($db->f("campo_onkeypress")) > 3)
+                      $form_content .= ' onKeyPress="'.$db->f("campo_onkeypress").'" ';
 
                    
 
@@ -656,6 +668,11 @@ function montaForm($form)
 
                    if(strlen($db->f("campo_selected")) > 3)
                       $form_content .= ' selected="'.$db->f("campo_selected").'" ';
+                   
+                   
+                   if(strlen($db->f("campo_onkeypress")) > 3)
+                      $form_content .= ' onKeyPress="'.$db->f("campo_onkeypress").'" ';
+                   
 
                   $form_content .= '>
                      <span class="help-block"></span>
@@ -696,6 +713,10 @@ function montaForm($form)
 
                    if(strlen($db->f("campo_style")) > 3)
                       $form_content .= ' style="'.$db->f("campo_style").'" ';
+                   
+                   if(strlen($db->f("campo_onkeypress")) > 3)
+                      $form_content .= ' onKeyPress="'.$db->f("campo_onkeypress").'" ';
+                   
          
          
          $form_content .= '>'.$db->f("campo_value").'</textarea>
