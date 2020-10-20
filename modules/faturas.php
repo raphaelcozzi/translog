@@ -33,6 +33,7 @@ require_once("modules/home.php");
 			$sql = "SELECT faturas.id AS id, 
                                 faturas.valor,
                                 faturas.obs,
+                                faturas.anexo,
                                 faturas_situacoes.nome AS situacao,
                                 DATE_FORMAT(faturas.data_emissao, '%d/%m/%Y') AS data_emissao, 
                                 DATE_FORMAT(faturas.data_pagamento, '%d/%m/%Y') AS data_pagamento,
@@ -57,7 +58,8 @@ require_once("modules/home.php");
 				$data_emissao_raw = $db->f("data_emissao_raw");			
 				$data_pagamento_raw = $db->f("data_pagamento_raw");			
 				$valor = $db->f("valor");			
-				$obs = $db->f("obs");			
+				$obs = $db->f("obs");
+                            $anexo= $db->f("anexo");
             
 
 				$listagem .= '<tr> 
@@ -66,6 +68,7 @@ require_once("modules/home.php");
 										<td>'.$data_pagamento.'</td> 
 										<td>'.$situacao.'</td> 
 										<td>'.nl2br($obs).'</td> 
+										<td><a href="'.$anexo.'" target="_blank"><i class="fa fa-download"></i></a></td> 
 										<td><a data-toggle="modal" href="#modal_fatura_'.($i+100).'" onclick="javascript:void(0);" >Editar</a></td>										
 										<td><a href="index.php?module=faturas&method=exclui&id='.$db->f("id").'" onclick="return(confirm(\'Confirma excluir a fatura ? \'))">Excluir</a></td>										
 									</tr>';
@@ -389,6 +392,29 @@ require_once("modules/home.php");
             $id_fatura = $db->get_last_insert_id("faturas","id");
             
             
+            
+            if(isset($_FILES['anexo']['name']))
+            {
+               // Pega extensão do arquivo
+               preg_match("/\.(gif|bmp|png|jpg|jpeg|pdf|doc|xls|docx|xlsx|zip|rar){1}$/i", $_FILES["anexo"]["name"], $ext);
+               // Gera um nome único para a imagem
+               $arquivo = md5(uniqid(time())) . "." . $ext[1];
+               // Caminho de onde a imagem ficará
+               $imagem_dir = "files/".$arquivo;
+               $arquivo = $imagem_dir;
+               // Faz o upload da imagem
+               if($ext[1] != "")
+               {
+                  move_uploaded_file($_FILES["anexo"]["tmp_name"], $imagem_dir);
+
+                  $sql = "UPDATE faturas SET anexo = '".$arquivo."' WHERE id = ".$id_fatura." LIMIT 1 ";				
+                  $db->query($sql,__LINE__,__FILE__);
+                  $db->next_record();
+               }
+            }
+            
+            
+            
             $this->notificacao("Fatura cadastrada com sucesso!", "green");
             header("Location: " . ABS_LINK . "faturas");
             
@@ -423,6 +449,28 @@ require_once("modules/home.php");
             
             $db->query($sql,__LINE__,__FILE__);
             $db->next_record();
+            
+            
+            if(isset($_FILES['anexo']['name']))
+            {
+               // Pega extensão do arquivo
+               preg_match("/\.(gif|bmp|png|jpg|jpeg|pdf|doc|xls|docx|xlsx|zip|rar){1}$/i", $_FILES["anexo"]["name"], $ext);
+               // Gera um nome único para a imagem
+               $arquivo = md5(uniqid(time())) . "." . $ext[1];
+               // Caminho de onde a imagem ficará
+               $imagem_dir = "files/".$arquivo;
+               $arquivo = $imagem_dir;
+               // Faz o upload da imagem
+               if($ext[1] != "")
+               {
+                  move_uploaded_file($_FILES["anexo"]["tmp_name"], $imagem_dir);
+
+                  $sql = "UPDATE faturas SET anexo = '".$arquivo."' WHERE id = ".$id_fatura." LIMIT 1 ";				
+                  $db->query($sql,__LINE__,__FILE__);
+                  $db->next_record();
+               }
+            }
+            
 
 
             $this->notificacao("Fatura atualizada com sucesso!", "green");
