@@ -493,11 +493,11 @@ require_once("modules/home.php");
 			$db2 = new db();
 			$db3 = new db();
 			$db4 = new db();
-
+/*
 			if($_SESSION['id'] != $_SESSION['boss'])
-         valida_privilegios();
+                        valida_privilegios();
                         
-         $_SESSION['page_title'] = "Editar Usuário";
+*/         $_SESSION['page_title'] = "Editar Usuário";
                         
 			$id = blockrequest($_REQUEST['id']);	
 			

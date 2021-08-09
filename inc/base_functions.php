@@ -52,7 +52,7 @@ function blockrequest($param)
 				Retira todas as tags html da string;
 				Retira qualquer isntrução SQL da string
 			*/
-			
+			/*
 								$str = strip_tags($param);
 
 	$p1 = str_replace("INSERT", " ", $str);
@@ -74,8 +74,8 @@ function blockrequest($param)
 	$p15 = str_replace("--", "", $p15);
 
 	$str = $p15;
-
-	return $str;
+*/
+	return $param;
 }
 
 function dolog($acao)

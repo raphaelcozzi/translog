@@ -23,7 +23,7 @@ require_once("modules/home.php");
                      }
                      else
                      {
-                        $data_de = date('Y-m-d');
+                         $data_de = date('Y-m-d', strtotime(date("Y-m-d"). ' - 1 month'));
 
                         $data_ate = date("Y-m-d");        
                      }

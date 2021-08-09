@@ -337,7 +337,7 @@ require_once("modules/home.php");
               $photo = $_FILES['photo'];
 		$photo_documento = $_FILES['photo_documento'];
 
-      		$nome = blockrequest($_REQUEST['nome']);
+      		$nome = $_REQUEST['nome'];
 		$email = blockrequest($_REQUEST['email']);
 		$id_veiculo = blockrequest($_REQUEST['id_veiculo']);
 		$celular = blockrequest($_REQUEST['celular']);
@@ -675,7 +675,7 @@ require_once("modules/home.php");
               $photo = $_FILES['photo'];
 		$photo_documento = $_FILES['photo_documento'];
 
-      		$nome = blockrequest($_REQUEST['nome']);
+      		$nome = $_REQUEST['nome'];
 		$email = blockrequest($_REQUEST['email']);
 		$id_veiculo = blockrequest($_REQUEST['id_veiculo']);
 		$celular = blockrequest($_REQUEST['celular']);
@@ -716,6 +716,7 @@ require_once("modules/home.php");
                               entrada = '".$entrada."',
                               saida = '".$saida."'
                               WHERE id = ".$id_entregador." ";
+               
                $db->query($sql,__LINE__,__FILE__);
                $db->next_record();
       

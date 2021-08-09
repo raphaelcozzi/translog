@@ -42,6 +42,7 @@ class home
 			$sql = "SELECT
                               registros.id AS id_registro
                             , registros.volumes AS volumes
+                            , registros.diaria AS diaria
                            , entregadores.nome AS entregador
                            , veiculos.photo AS photo
                            , veiculos.placa AS placa
@@ -70,11 +71,13 @@ class home
 				$photo = $db->f("photo");			
 				$data_registro = $db->f("data_registro");			
 				$hora_registro = $db->f("hora_registro");			
-				$volumes = $db->f("volumes");			
+				$volumes = $db->f("volumes");
+                           $diaria = $db->f("diaria");	
 
 				$listagem_saidas .= '<tr> 
 										<td>'.$entregador.'</td>
-										<td>'.$placa.'/'.$marca.'/'.$modelo.'</td>
+										<!--<td>'.$placa.'/'.$marca.'/'.$modelo.'</td>-->
+                                                                     <td>R$ '.$this->decimal_to_brasil_real($diaria).'</td> 
 										<td>'.$volumes.'</td> 
 										<td>'.$data_registro.'</td> 
 										<td>'.$hora_registro.'</td> 
@@ -94,6 +97,7 @@ class home
                             , registros.volumes AS volumes
                             , registros.obs AS obs
                            , entregadores.nome AS entregador
+                            , registros.id_entregador AS id_entregador
                            , veiculos.photo AS photo
                            , veiculos.placa AS placa
                            , veiculos.modelo AS modelo
@@ -107,7 +111,7 @@ class home
                            INNER JOIN veiculos 
                                ON (registros.id_veiculo = veiculos.id)
                            INNER JOIN veiculos_marcas 
-                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 2 AND TO_DAYS(registros.data_registro) = TO_DAYS(NOW()) ";
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 2 AND TO_DAYS(registros.data_registro) = TO_DAYS(NOW())  ";
 			$db->query($sql,__LINE__,__FILE__);
 			$db->next_record();
 			
@@ -115,6 +119,7 @@ class home
 			{
 				$id_registro = $db->f("id_registro");			
 				$entregador = $db->f("entregador");			
+				$id_entregador = $db->f("id_entregador");			
 				$marca = $db->f("marca");			
 				$placa = $db->f("placa");			
 				$modelo = $db->f("modelo");			
@@ -131,11 +136,163 @@ class home
 										<td>'.$data_registro.'</td> 
 										<td>'.$hora_registro.'</td> 
 										<td>'.nl2br($obs).'</td> 
-                                                                  <td align="center"><a href="" ><button class="btn blue" >Ver Saída</button></a></td>
+                                                                  <td align="center"> <a data-toggle="modal" href="#modal_'.$id_registro.'" onclick="javascript:void(0);" ><button class="btn blue" >Ver Saída</button></a></td>
                                                                   <td align="center"><a href="index.php?module=registros&method=exclui&id='.$id_registro.'" onclick="return(confirm(\'Confirma excluir o registro?\'))"><i class="fa fa-trash"></i></a></td>
 									</tr>';
 				
 				
+		               $form = montaForm("registro");
+                     
+                              $form =  str_replace("col-md-4", "col-md-9", $form);
+                              
+                              
+                              $sql2 = "SELECT id_saida FROM registros_retornos WHERE id_retorno = ".$id_registro." ";
+                              $db2->query($sql2,__LINE__,__FILE__);
+                              $db2->next_record();
+                              $id_saida = $db2->f("id_saida");
+                              
+			$sql2 = "SELECT
+                             registros.volumes AS volumes_saida
+                            , registros.obs AS obs_saida
+                            , registros.id_entregador AS id_entregador
+                            , registros.diaria AS diaria_retorno
+                           , entregadores.nome AS entregador
+                           , DATE_FORMAT(registros.data_registro,'%Y-%m-%d') AS data_registro_raw_saida
+                           , DATE_FORMAT(registros.hora_registro,'%H:%i') AS hora_registro_raw_saida
+                           FROM
+                           registros
+                           INNER JOIN entregadores 
+                               ON (registros.id_entregador = entregadores.id)
+                           INNER JOIN veiculos 
+                               ON (registros.id_veiculo = veiculos.id)
+                           INNER JOIN veiculos_marcas 
+                               ON (veiculos.id_marca = veiculos_marcas.id) WHERE tipo = 1  AND registros.id = ".$id_saida." ";
+                              $db2->query($sql2,__LINE__,__FILE__);
+                              $db2->next_record();
+
+                              $data_registro_raw_saida = $db2->f("data_registro_raw_saida");
+                              $hora_registro_raw_saida = $db2->f("hora_registro_raw_saida");
+                              $volumes_saida = $db2->f("volumes_saida");
+                              $obs_saida = $db2->f("obs_saida");
+                              $diaria_retorno = $db2->f("diaria_retorno");
+                              
+                              
+                              
+                              
+                             $form =  str_replace("{data_registro}", $data_registro_raw_saida, $form);
+                             $form =  str_replace("{hora_registro}", $hora_registro_raw_saida, $form);
+                             $form =  str_replace("{volumes}", $volumes_saida, $form);
+                             $form =  str_replace("{obs}", $obs_saida, $form);
+                             
+                      
+                             
+                     $sql2 = "SELECT
+                     veiculos.id AS id
+                     , veiculos.placa AS placa
+                     , veiculos.modelo AS modelo
+                     , veiculos_marcas.nome AS marca
+                     FROM
+                     veiculos
+                     INNER JOIN veiculos_marcas 
+                     ON (veiculos.id_marca = veiculos_marcas.id)";
+                     $db2->query($sql2,__LINE__,__FILE__);
+                     $db2->next_record();
+                     
+                             
+                    $listagem_veiculos_details = "<option value='0' selected>- SELECIONE -</option>";
+			
+			for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+			{
+				$listagem_veiculos_details .= "<option value='".$db2->f("id")."' ";
+            
+                              $sql3 = "SELECT * FROM entregadores_veiculos_fixos WHERE id_veiculo = ".$db2->f("id")." AND id_entregador = ".$id_entregador." ";
+                              $db3->query($sql3,__LINE__,__FILE__);
+                              $db3->next_record();
+				
+				if($db3->num_rows() > 0 || $id_veiculo == $db2->f("id_veiculo"))
+					$listagem_veiculos_details .= "selected='selected'";
+				
+				$listagem_veiculos_details .=  ">".$db2->f("marca")." ".$db2->f("modelo")." ".$db2->f("placa")."</option>";			
+	
+				$db2->next_record();
+
+			}
+
+                     $sql2 = "select id, nome from entregadores";
+                     $db2->query($sql2,__LINE__,__FILE__);
+                     $db2->next_record();
+
+			$listagem_entregadores_details = "<option value='0' selected>- SELECIONE -</option>";
+			
+			for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+			{
+				$listagem_entregadores_details .= "<option value='".$db2->f("id")."' ";
+				
+				if($db2->f("id") == $id_entregador)
+					$listagem_entregadores_details .= "selected='selected'";
+				
+				$listagem_entregadores_details .= ">".$db2->f("nome")."</option>";			
+	
+				$db2->next_record();
+
+			}
+
+                  
+                     $listagem_diarias = "";
+         
+                     $sql2 = "select id, valor from diarias ORDER BY ordem ASC";
+                     $db2->query($sql2,__LINE__,__FILE__);
+                     $db2->next_record();
+
+			for($i2 = 0; $i2 < $db2->num_rows(); $i2++)
+			{
+				$listagem_diarias .= "<option value='".$db2->f("valor")."' ";
+				
+				if($db2->f("valor") == $diaria_retorno)
+					$listagem_diarias .= "selected='selected'";
+				
+				$listagem_diarias .= ">".  $this->decimal_to_brasil_real($db2->f("valor"))."</option>";			
+	
+				$db2->next_record();
+
+			}
+
+                           $veiculos = montaSelect("registro",$listagem_veiculos_details,1); 
+                           $entregadores = montaSelect("registro",$listagem_entregadores_details,2); 
+                           $diarias = montaSelect("registro",$listagem_diarias,8); 
+                           
+                           $diarias = str_replace('<select ','<select disabled="disabled" ',$diarias);
+                           
+                           
+            
+            
+                           $modals .= '<div class="modal fade" id="modal_'.$id_registro.'" tabindex="-1" role="basic" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="height:auto !important;">
+                                                <div class="modal-header">
+                                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                    <h4 class="modal-title">Detalhes da Saída referente ao retorno</h4>
+                                                </div>
+                                                <div class="modal-body" style="width:100%;"> 
+                                                   <form action="index.php?module=registros&method=main" method="post" name="editar"  class="form-horizontal" enctype="multipart/form-data">
+                                                   '.$entregadores.'
+                                                      '.$veiculos.' '.$diarias.'<div>
+                                          '.$form.'                                             
+                                                <div class="modal-footer">
+                                                <center>   
+
+                                                 <!--  <button type="submit" class="btn green" style="width:300px;">Continuar &rightarrow;</button><br><br>-->
+                                                    </center>
+                                                </form>
+                                      
+                                                   <button type="button" id="closemodal" class="btn dark btn-outline" data-dismiss="modal">Fechar</button>
+                                                </div>
+                                            </div>
+                                            <!-- /.modal-content -->
+                                        </div>
+                                        <!-- /.modal-dialog -->
+                                    </div>';
+            
 				
 				
 				$db->next_record();
@@ -231,6 +388,7 @@ class home
 		$this->cabecalho();
 		$GLOBALS["base"]->template = new template();
 
+		$GLOBALS["base"]->template->set_var("modals",$modals);
 		$GLOBALS["base"]->template->set_var('grid_saidas', $grid_saidas);
 		$GLOBALS["base"]->template->set_var('grid_retornos', $grid_retornos);
 		$GLOBALS["base"]->template->set_var('grid_resumo_dia', $grid_resumo_dia);

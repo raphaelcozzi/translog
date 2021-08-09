@@ -775,6 +775,24 @@ require_once("modules/home.php");
             header("Location: " . ABS_LINK . "/veiculos");
       
       }
+      
+   function exclui()
+   {
+      
+		@session_start();
+		$db = new db();
+
+            $id = blockrequest($_REQUEST['id']);
+            
+            $sql = "DELETE FROM veiculos WHERE id = ".$id." LIMIT 1 ";
+            $db->query($sql,__LINE__,__FILE__);
+            $db->next_record();
+
+      
+            $this->notificacao("Veículo excluído com sucesso!", "green");
+            header("Location: " . ABS_LINK . "/veiculos");
+   }
+      
 	   
       
 }                                                                                                     

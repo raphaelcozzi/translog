@@ -112,7 +112,7 @@
       <!-- END EXAMPLE TABLE PORTLET-->
    </div>
 </div>
-
+{modals}
          
 <script>
    function ordena()
